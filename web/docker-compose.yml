@@ -1,0 +1,22 @@
+services:
+  
+  app:
+  
+    build: .
+    container_name: laravel_app
+    network_mode: host  # Tambah ini
+    volumes:
+      - .:/app
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - /app/node_modules  # Exclude node_modules dari mount
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: projectapp
+      DB_USERNAME: root
+      DB_PASSWORD: Mysql@123
+      
+  
+      
+

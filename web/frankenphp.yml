@@ -1,0 +1,10 @@
+server:
+  listen: :8000
+
+  root: /app/public
+  index: index.php
+
+  php:
+    worker: true
+
+  file_server: true
