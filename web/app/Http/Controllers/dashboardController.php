@@ -248,16 +248,230 @@ class dashboardController extends Controller
                 $kode_temp = Session::get('kodeTemp');
                 $cek       = DB::table('tabel_item')->where('kode_temp', $kode_temp)->count();
                 $arrData = array("jumlah_data" => $cek,
-                                  "arrData" => array());
+                                  "arr" => array());
                 if($cek >= 1){
                     $query     = "SELECT * FROM tabel_item WHERE kode_temp='$kode_temp'";
                     $getData   = DB::select(DB::raw($query));
                     foreach($getData As $index => $value){
-                        
+                        $gabung[] = array(
+                             "kodeTem" => $value->kode_temp, 
+                             "kodeItem" => $value->kode_item,
+                             "jenis" => $value->jenis,
+                             "namaItem" => $value->nama_item,
+                             "locationFile" => $kode_temp."/".$value->nama_file,
+                             "stok" => $value->stok,
+                             "harga" => $value->harga,
+                             "diskon" => $value->diskon
+                            );
                     }
                     
+                    $arrData['arr'] = $gabung;
+                    echo json_encode($arrData);
+                }elseif($cek < 1){
+                    $arrData = array("jumlah_data" => $cek,
+                                    "arr" => array());
+                    echo json_encode($arrData);               
                 }
                 break;
+
+            case 'getMeja' :
+                $kodetemp = $req->input('kode');
+                $cek      = DB::table('tabel_meja')->where('kode_temp' , $kodetemp)->count();
+            
+                if($cek > 0){
+                    $arr     = array(
+                        "jmlData" => $cek,
+                        "arrData" => array()
+                        );
+                    $getData = DB::table('tabel_meja')->where('kode_temp' , $kodetemp)->get();
+                    foreach($getData As $idx => $val){
+                        $gabung[] = array(
+                            "kodeMeja"    => $val->kode_meja,
+                            "nomorMeja" => $val->nomor_meja
+                        );
+                    }
+                     $arr['arrData'] = $gabung;
+                     echo json_encode($arr);
+                }elseif($cek < 1){
+                    $arr     = array(
+                        "jmlData" => $cek,
+                        "arrData" => array()
+                        );
+                    echo json_encode($arr);
+                }
+                break;
+
+            case 'addPesanan' :
+                    $kode_tempat = $req->input('kodeTemp');
+                    $kode_item   = $req->input('kode_item');
+                    $harga       = $req->input('harga');
+                    $diskon      = $req->input('disc');
+                    $kodeMeja    = $req->input('meja');
+                    $nama_item   = $req->input('nama_item');
+                    $user        = Session::get('userId');
+                    $cek         = DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
+                                                           ->where('user',$user)
+                                                           ->where('kode_meja',$kodeMeja)
+                                                           ->where('kode_item', $kode_item)->count();
+                    if($cek < 1){
+                        $potongan   = ($harga * $diskon) / 100;
+                        $hargaJual  = $harga - $potongan;
+                        $arrInsert  = array(
+                            'kode_temp' => $kode_tempat,
+                            'user'      => $user,
+                            'kode_meja' => $kodeMeja,
+                            'kode_item' => $kode_item,
+                            'nama_item' => $nama_item,
+                            'harga_jual'=> $hargaJual,
+                            'diskon'    => $diskon,
+                            'qty'       => 1,
+                            'total'     => 1 * $hargaJual
+                        );
+                        $insert    = DB::table('tmp_pesanan')->insert($arrInsert);
+                        $arrData   = array(
+                            'msg' => 'insert sukses',
+                            'qty' => 1
+                        );
+                        echo json_encode($arrData);
+                    }elseif($cek > 0){
+                        $potongan   = ($harga * $diskon) / 100;
+                        $hargaJual  = $harga - $potongan;
+                        $getQty     = DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
+                                                              ->where('user',$user)
+                                                              ->where('kode_meja',$kodeMeja)
+                                                              ->where('kode_item', $kode_item)->value('qty');
+                        
+                        $qtyUpdate =  $getQty +1;                                
+                        $updateTable =  DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
+                                                              ->where('user',$user)
+                                                              ->where('kode_meja',$kodeMeja)
+                                                              ->where('kode_item', $kode_item)->update([
+                                                                'qty' => $qtyUpdate,
+                                                                'total' => $qtyUpdate * $hargaJual
+                                                              ]);     
+                        $arrData   = array(
+                            'msg' => 'update sukses',
+                            'qty' => $qtyUpdate
+                        ); 
+                        echo json_encode($arrData);                                                                  
+                    }                                       
+                break;
+
+                case 'delPesanan' :
+                    $kode_tempat = $req->input('kodeTemp');
+                    $kode_item   = $req->input('kode_item');
+                    $harga       = $req->input('harga');
+                    $diskon      = $req->input('disc');
+                    $kodeMeja    = $req->input('meja');
+                    $nama_item   = $req->input('nama_item');
+                    $user        = Session::get('userId');
+                    $cek         = DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
+                                                           ->where('user',$user)
+                                                           ->where('kode_meja',$kodeMeja)
+                                                           ->where('kode_item', $kode_item)->count();
+                    if($cek > 0){
+                        $potongan   = ($harga * $diskon) / 100;
+                        $hargaJual  = $harga - $potongan;
+                        $getQty     = DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
+                                                              ->where('user',$user)
+                                                              ->where('kode_meja',$kodeMeja)
+                                                              ->where('kode_item', $kode_item)->value('qty');
+                                
+                        if($getQty > 1){
+                         $qtyUpdate   =  $getQty - 1;   
+                         $updateTable =  DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
+                                                              ->where('user',$user)
+                                                              ->where('kode_meja',$kodeMeja)
+                                                              ->where('kode_item', $kode_item)->update([
+                                                                'qty' => $qtyUpdate,
+                                                                'total' => $qtyUpdate * $hargaJual
+                                                              ]);  
+                        $arrData   = array(
+                            'msg' => 'update sukses',
+                            'qty' => $qtyUpdate
+                        ); 
+                        echo json_encode($arrData);
+                        
+                        }elseif($getQty == 1){
+                         $deleteRow = DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
+                                                              ->where('user',$user)
+                                                              ->where('kode_meja',$kodeMeja)
+                                                              ->where('kode_item', $kode_item)->delete();
+                        $arrData   = array(
+                                    'msg' => 'update sukses',
+                                    'qty' => 0
+                                ); 
+                        echo json_encode($arrData);                                     
+                        }
+                    }elseif($cek < 1){
+                        $arrData   = array(
+                            'msg' => 'data kosong',
+                            'qty' => 0
+                        ); 
+                        echo json_encode($arrData);
+                    }
+                    break;
+
+                    case 'getkeranjang':
+                        $kode_tempat = $req->input('kodeTempat');
+                        $kodeMeja    = $req->input('meja');
+                        $user        = Session::get('userId');
+                        $cek         = DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
+                                                           ->where('user',$user)
+                                                           ->where('kode_meja',$kodeMeja)->count();
+                        if($cek > 0){
+                            $gabung = collect();
+                            $get = DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
+                                                           ->where('user',$user)
+                                                           ->where('kode_meja',$kodeMeja)->get();
+                            foreach($get As $index => $value){
+                                $getNamaFile = DB::table('tabel_item')->where('kode_temp', $kode_tempat)
+                                                                      ->where('kode_item', $value->kode_item)
+                                                                      ->value('nama_file');
+                                $gabung->push([
+                                    "kodeTem"   => $value->kode_temp, 
+                                    'user'      => $value->user,
+                                    'kodeItem'  => $value->kode_item,
+                                    'namaItem'  => $value->nama_item,
+                                    'qty'       => $value->qty,
+                                    'hargaJual' => $value->harga_jual,
+                                    'sub'  => $value->total,
+                                    "locationFile" => $kode_tempat."/".$getNamaFile
+                                ]);
+                            }    
+                                $gabung = $gabung
+                                        ->sortBy('kodeTem')
+                                        ->sortBy('namaItem')
+                                        ->values()
+                                        ->toArray();
+                               $arr = [
+                                    'jmlData' => $cek,
+                                    'load'    => $gabung
+                                ];
+                                                        
+                        }elseif($cek < 1){
+                            $arr = [
+                                'jmlData' => $cek,
+                                 'load'   => []
+                                ];
+                           
+                        }
+                         echo json_encode($arr, JSON_UNESCAPED_UNICODE);
+                        break;
+
+                        case 'cekPesanan':
+                            $kodeMeja    = $req->input('meja');
+                            $user        = $req->input('user');
+                            $kode_tempat = Session::get('kodeTemp');
+                            $cek         = DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
+                                                           ->where('user',$user)
+                                                           ->where('kode_meja',$kodeMeja)->count();
+                            if($cek > 0){
+                                echo "ada";
+                            }elseif($cek < 1){
+                                 echo "kosong";
+                            }                 
+                            break;
         }
     }
 }

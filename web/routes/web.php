@@ -79,4 +79,5 @@ Route::get('pesanan', function(){
     return view('pages.pagePemesanan');
 })->name('pagePesanan')->middleware('authEmail');
 
-Route::post('/pesanan/actionPesanan',[dashboardController::class, 'act_pesanan'])->name('actionpesanan');
+Route::post('/pesanan/actionPesanan',[dashboardController::class, 'act_pesanan'])->name('actionpesanan')->middleware('authEmail');
+Route::get('/dapur', function() { return view('pages.dapur');})->name('halDapur')->middleware('authEmail');

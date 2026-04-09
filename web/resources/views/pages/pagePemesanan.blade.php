@@ -11,7 +11,8 @@
   <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" />
   <!-- Font Modern -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
   <!-- Tailwind Play CDN -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -81,7 +82,14 @@
 
 </head>
 <body class="bg-slate-50 text-slate-900">
-
+    <div class="loading-overlay">
+            <div class="floating-box">
+              <div class="float-spinner"></div>
+              <div class="loading-text">Sedang Memuat...</div>
+            </div>
+        </div>
+      </div>
+  </div>
   <!-- NAVBAR -->
   <nav class="glass-nav w-full">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex justify-between items-center">
@@ -138,9 +146,20 @@
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
               <div class="w-1 h-7 bg-orange-500 rounded-full"></div>
-              <h2 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Makanan Utama</h2>
+              <h2 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">MENU</h2>
             </div>
-            <button class="text-orange-500 text-xs sm:text-sm font-bold">Lihat Semua</button>
+             <div class="flex mb-6">
+                  <select id="mejaData"
+                       
+                      onchange="updateNavMeja(this.value)" 
+                      class="block w-full appearance-none cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 pr-10 text-sm font-medium text-slate-700 transition-all focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 hover:border-slate-300"
+                    > 
+                    <option value="" disabled selected>Pilih Nomor Meja</option> 
+                    <optgroup id="select_meja" label="List meja">       
+                    
+                    </optiongroup>
+                    </select>
+              </div>      
           </div>
 
           <!-- Menu Container for Dynamic Rendering -->
@@ -159,6 +178,15 @@
               <span id="cart-badge" class="bg-orange-500 text-white text-[10px] font-black px-2.5 py-1.5 rounded-xl uppercase tracking-widest">0 Item</span>
             </div>
 
+            <div class="p-6 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
+                  <h3 class="font-black text-slate-800">Pelanggan</h3>
+                  <input type="text" id="namaPelanggan" class="" maxlength="100" placeholder="Nama pelanggan">
+            
+            </div>
+            <div class="p-6 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 ml-6">Catatan Pesanan</label>
+                <textarea id="catatan_pesanan" rows="2" placeholder="Contoh: Tidak pakai bawang, pedas..." class="input-field"></textarea>
+            </div>   
             <!-- Empty Cart Message -->
             <div id="empty-cart-msg" class="p-10 text-center space-y-3">
               <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-300">
@@ -186,51 +214,13 @@
                   <span id="cart-total" class="text-xl font-black text-orange-600">Rp0</span>
                 </div>
               </div>
-
-            <!-- Form Meja & Catatan -->
-              <div class="pt-6 border-t border-slate-100 space-y-5">
-                <div>
-                  <!-- Label dengan Utility Tailwind 3.4 -->
-                  <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2 ml-1">
-                    Pilih Nomor Meja
-                  </label>
-                  
-                  <div class="relative group">
-                    <!-- Select Field: Mengganti input-field dengan utility classes -->
-                    <select 
-                      id="select-meja" 
-                      onchange="updateNavMeja(this.value)" 
-                      class="block w-full appearance-none cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 pr-10 text-sm font-medium text-slate-700 transition-all focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 hover:border-slate-300"
-                    >
-                      <option value="" disabled selected>Pilih Nomor Meja</option>
-                      <optgroup label="Area Indoor" class="font-bold text-slate-900 bg-slate-50">
-                        <option value="Meja 01" class="bg-white">Meja 01 (Lantai 1)</option>
-                        <option value="Meja 02" class="bg-white">Meja 02 (Lantai 1)</option>
-                      </optgroup>
-                      <optgroup label="Area Outdoor" class="font-bold text-slate-900 bg-slate-50">
-                        <option value="Meja 03" class="bg-white">Meja 03 (Taman)</option>
-                        <option value="Meja 04" class="bg-white">Meja 04 (Taman)</option>
-                      </optgroup>
-                      <option value="Take Away">Bungkus (Take Away)</option>
-                    </select>
-
-                    <!-- Icon Dropdown (Custom Arrow) -->
-                    <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400 group-hover:text-slate-600 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            <!-- Form Meja & Catatan -->
+        
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Catatan Pesanan</label>
-                <textarea id="catatan-pesanan" rows="2" placeholder="Contoh: Tidak pakai bawang, pedas..." class="input-field resize-none"></textarea>
+              
               </div>
             </div>
             
-              <button class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-black active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+              <button onclick="kirimPesanan()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-black active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                 Konfirmasi Pesanan
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="9 18 15 12 9 6"></polyline>
@@ -267,48 +257,168 @@
       </div>
     </button>
   </div>
-  <script type="text/javascript" src="{{ asset('assets/myjs/xhr.js') }}"></script>
+ <script src="{{ asset('assets/js/sweetalert2.js') }}"></script>
+ 
   <script>
-      const getData  = () => {
-      const link    = "/pesanan/actionPesanan";
-      let data      = "action=loadData";
-      xml.open('POST',link,true);
-      xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xml.setRequestHeader('X-CSRF-TOKEN',token);
-      xml.onreadystatechange = function(){
-        if(xml.status == 200 && xml.readyState == 4){
-          let respon = xml.responseText;
-          console.log(respon);
-        }
+      const loadingStop = () => {
+        document.querySelector('.loading-overlay').style.display='none';
       }
-      xml.send(data);
+      const loadingStart = () => {
+        document.querySelector('.loading-overlay').style.display='';
+      }
+      loadingStop();
+      let token = document.querySelector('meta[name="csrf-token"]').content;
+      let MENU_DATA = [];
+const getData = () => {
+    return new Promise((resolve, reject) => {
+        const xml = new XMLHttpRequest();
+        const link = "{{route('actionpesanan')}}";
+        const data = "action=loadData";
+        
+        // 🚀 Prioritas tinggi + no cache
+        xml.open('POST', link, true);
+        xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xml.setRequestHeader('X-CSRF-TOKEN', token);
+        xml.timeout = 15000; // 15s timeout
+        
+        xml.onreadystatechange = function() {
+            if (xml.readyState === 4) {
+                if (xml.status === 200) {
+                    try {
+                        const jsn = JSON.parse(xml.responseText);
+                        MENU_DATA = jsn.arr || [];
+                        console.log(`✅ ${MENU_DATA.length} items loaded`);
+                        resolve(jsn);
+                    } catch (e) {
+                        reject(new Error('JSON Parse Error'));
+                    }
+                } else {
+                    reject(new Error(`HTTP ${xml.status}`));
+                }
+            }
+        };
+        
+        xml.ontimeout = () => reject(new Error('Timeout 15s'));
+        xml.onerror = () => reject(new Error('Network Error'));
+        
+        xml.send(data);
+    });
+};
+
+const getKeranjang = () => {
+  return new Promise((resolve,reject) => {
+          const xml       = new XMLHttpRequest();
+          const link      = "{{route('actionpesanan')}}";
+          const meja      = document.querySelector('#mejaData').value;
+          const kodetemp  = "{{Session::get('kodeTemp')}}";
+          const data      = `action=getkeranjang&meja=${meja}&kodeTempat=${kodetemp}`;
+          xml.open('POST',link,true);
+          xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+          xml.setRequestHeader('X-CSRF-TOKEN', token);
+          xml.timeout = 15000; // 15s timeout
+          xml.onreadystatechange = function(){
+            if(xml.readyState === 4){
+              if(xml.status === 200){
+                  try {
+                    const res = xml.responseText;
+                    let json  = JSON.parse(res);       
+                    resolve(json);                      
+                  } catch(e){
+                    reject(new Error('Json Parse Error'));
+                  }
+              }else{
+                reject(new Error(`HTTP ${xml.status}`));
+              }
+            }
+          }
+          xml.ontimeout = () => reject(new Error('Timeout 15 second'));
+          xml.onerror = () => reject(new Error('Network Error'));
+          xml.send(data);
+          
+
+  });
+}
+
+const renderCart = (json) => {
+  const cartBadge = document.getElementById('cart-badge');
+  const container = document.getElementById('cart-items-container');
+  const emptyMsg = document.getElementById('empty-cart-msg');
+  const subtotalEl = document.getElementById('cart-subtotal');
+  const taxEl = document.getElementById('cart-tax');
+  const totalEl = document.getElementById('cart-total');
+  const checkoutBtn = document.getElementById('checkout-btn');
+  const mobiCartBadge       = document.getElementById('mobile-cart-badge');
+  const mobiTotal           = document.getElementById('mobile-cart-total');
+  if (json.jmlData > 0) {
+    container.innerHTML = '';
+    
+    let subtotal = 0;
+    json.load.forEach((item, index) => {
+      subtotal += item.sub;
+      const itemHTML = `
+        <div class="cart-item group relative flex gap-4 p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-slate-100 hover:border-slate-200 transition-all duration-200 hover:shadow-md" data-index="${index}">
+          <button class="remove-item absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-red-600 shadow-lg" title="Hapus">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+          
+          <div class="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-slate-100">
+            <img src="{{asset('folderUser')}}/${item.locationFile}" alt="${item.namaItem}" class="w-full h-full object-cover" onerror="this.src='/placeholder.jpg'">
+          </div>
+          
+          <div class="flex-1 min-w-0">
+            <h4 class="font-bold text-sm text-slate-800 leading-tight line-clamp-2">${item.namaItem}</h4>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="text-xs text-slate-500">Rp ${parseInt(item.hargaJual).toLocaleString('id-ID')}</span>
+              <span class="text-xs text-slate-400">x</span>
+              <div class="qty-controls flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-full">
+                    <span class="qty font-bold text-sm min-w-[20px] text-center">${item.qty}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="text-right flex flex-col items-end flex-shrink-0">
+            <span class="font-bold text-sm text-slate-800">Rp ${item.sub.toLocaleString('id-ID')}</span>
+          </div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', itemHTML);
+    });
+
+    //const tax = Math.round(subtotal * 0.11);
+    const total = subtotal;
+
+    cartBadge.textContent = `${json.jmlData} Item${json.jmlData > 1 ? 's' : ''}`;
+    mobiCartBadge.textContent = `${json.jmlData} Item${json.jmlData > 1 ? 's' : ''}`;
+    container.classList.remove('hidden');
+    emptyMsg.classList.add('hidden');
+    
+    subtotalEl.textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
+    //taxEl.textContent = `Rp ${tax.toLocaleString('id-ID')}`;
+    totalEl.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+    mobiTotal.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+    
+    if(checkoutBtn) {
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = `Checkout (Rp ${total.toLocaleString('id-ID')})`;
     }
-    const MENU_DATA = [
-      {
-        id: 1,
-        name: 'Nasi Goreng Spesial',
-        price: 35000,
-        desc: 'Nasi goreng bumbu rahasia dengan topping ayam, telur, dan kerupuk.',
-        img: 'https://images.unsplash.com/photo-1512058560366-cd2427ff065b?auto=format&fit=crop&q=80&w=600',
-        popular: true
-      },
-      {
-        id: 2,
-        name: 'Mie Ayam Jamur',
-        price: 30000,
-        desc: 'Mie kenyal dengan topping ayam bumbu manis dan jamur kancing segar.',
-        img: 'https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&q=80&w=600',
-        popular: false
-      },
-      {
-        id: 3,
-        name: 'Sate Ayam Madura',
-        price: 45000,
-        desc: 'Sate ayam empuk dengan bumbu kacang khas Madura dan lontong.',
-        img: 'https://images.unsplash.com/photo-1529566652340-2c41a2c3bc65?auto=format&fit=crop&q=80&w=600',
-        popular: false
-      }
-    ];
+
+  } else {
+    container.classList.add('hidden');
+    emptyMsg.classList.remove('hidden');
+    cartBadge.textContent = '0 Item';
+    mobiCartBadge.textContent = '0 Item';
+    subtotalEl.textContent = 'Rp 0';
+    taxEl.textContent = 'Rp 0';
+    totalEl.textContent = 'Rp 0';
+    mobiTotal.textContent = 'Rp 0';
+    if(checkoutBtn) {
+      checkoutBtn.disabled = true;
+      checkoutBtn.textContent = 'Checkout';
+    }
+  }
+};
 
     let cart = {};
 
@@ -316,115 +426,130 @@
       return 'Rp' + num.toLocaleString('id-ID');
     }
 
-    function updateCartUI() {
-      const items = Object.values(cart);
-      const cartBadge = document.getElementById('cart-badge');
-      const mobileBadge = document.getElementById('mobile-cart-badge');
-      const container = document.getElementById('cart-items-container');
-      const emptyMsg = document.getElementById('empty-cart-msg');
-      const subtotalEl = document.getElementById('cart-subtotal');
-      const taxEl = document.getElementById('cart-tax');
-      const totalEl = document.getElementById('cart-total');
-      const mobileTotalEl = document.getElementById('mobile-cart-total');
 
-      const count = items.reduce((sum, item) => sum + item.qty, 0);
-      const subtotal = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
-      const tax = subtotal * 0.11;
-      const total = subtotal + tax;
 
-      cartBadge.textContent = `${count} Item`;
-      mobileBadge.textContent = `${count} Item`;
-      subtotalEl.textContent = formatRupiah(subtotal);
-      taxEl.textContent = formatRupiah(tax);
-      totalEl.textContent = formatRupiah(total);
-      mobileTotalEl.textContent = formatRupiah(total);
-
-      if (count > 0) {
-        container.classList.remove('hidden');
-        emptyMsg.classList.add('hidden');
+    function increment(kodetemp,kodeItem,harga,diskon,namaItem) {
+      const meja = document.querySelector('#mejaData').value;
+      if(meja == ""){
+            Swal.fire({
+                    icon  : "error",
+                    title : "oops",
+                    text  : "pilih meja terlebih dahulu",
+                    showConfirmButton: true,
+                      didClose: () => {
+                       document.getElementById("mejaData").focus(); 
+                      }
+             });
         
-        container.innerHTML = items.map(item => `
-          <div class="flex gap-4">
-            <div class="w-14 h-14 rounded-2xl overflow-hidden shrink-0 shadow-sm">
-              <img src="${item.img}" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-grow min-w-0">
-              <h4 class="font-bold text-slate-800 text-sm truncate">${item.name}</h4>
-              <p class="text-slate-400 text-[10px] mt-0.5">${formatRupiah(item.price)} x ${item.qty}</p>
-              <div class="flex items-center gap-4 mt-2">
-                <button onclick="decrement(${item.id})" class="w-7 h-7 flex items-center justify-center border border-slate-300 rounded-full text-slate-400 hover:border-slate-500 hover:text-slate-600 transition-all">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-                <span class="text-xs font-bold text-slate-700">${item.qty}</span>
-                <button onclick="increment(${item.id})" class="w-7 h-7 flex items-center justify-center border border-blue-500 rounded-full text-blue-500 hover:bg-blue-50 transition-all">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-              </div>
-            </div>
-            <div class="text-right flex flex-col justify-between shrink-0">
-              <span class="font-bold text-slate-800 text-sm italic">${formatRupiah(item.price * item.qty)}</span>
-              <button onclick="removeFromCart(${item.id})" class="text-slate-300 hover:text-red-500">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-        `).join('');
-      } else {
-        container.classList.add('hidden');
-        emptyMsg.classList.remove('hidden');
+      }else{
+          const xml     = new XMLHttpRequest();
+          const link    = "{{route('actionpesanan')}}";
+          const meja    = document.getElementById("mejaData").value; 
+          let data      = "action=addPesanan&kodeTemp="+kodetemp+"&kode_item="+kodeItem+"&harga="+harga+"&disc="+diskon+"&meja="+meja+"&nama_item="+namaItem;
+          xml.open("POST",link,true);
+          xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+          xml.setRequestHeader('X-CSRF-TOKEN', token);
+          xml.onreadystatechange = function(){
+              if(xml.status == 200 && xml.readyState == 4){
+                  const res = xml.responseText;
+                  const jsn = JSON.parse(res);
+                  if(jsn.msg == "insert sukses"){
+                      document.getElementById(`#${kodeItem}`).value = jsn.qty;
+                  }else if(jsn.msg == "update sukses"){
+                      document.getElementById(`#${kodeItem}`).value = jsn.qty;
+                  }
+                  loadKeranjang();
+              }
+            }
+          xml.send(data);
       }
 
-      renderMenu();
     }
 
-    function increment(id) {
-      if (!cart[id]) {
-        const item = MENU_DATA.find(i => i.id === id);
-        cart[id] = { ...item, qty: 1 };
-      } else {
-        cart[id].qty++;
+    function decrement(kodetemp,kodeItem,harga,diskon,namaItem) {
+       const meja = document.querySelector('#mejaData').value;
+      if(meja == ""){
+            Swal.fire({
+                    icon  : "error",
+                    title : "oops",
+                    text  : "pilih meja terlebih dahulu",
+                    showConfirmButton: true,
+                      didClose: () => {
+                       document.getElementById("mejaData").focus(); 
+                      }
+             });
+      }else{
+        const xml     = new XMLHttpRequest();
+          const link    = "{{route('actionpesanan')}}";
+          const meja    = document.getElementById("mejaData").value; 
+          let data      = "action=delPesanan&kodeTemp="+kodetemp+"&kode_item="+kodeItem+"&harga="+harga+"&disc="+diskon+"&meja="+meja+"&nama_item="+namaItem;
+          xml.open("POST",link,true);
+          xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+          xml.setRequestHeader('X-CSRF-TOKEN', token);
+          xml.onreadystatechange = function(){
+              if(xml.status == 200 && xml.readyState == 4){
+                  const res = xml.responseText;
+                  const jsn = JSON.parse(res);
+                  if(jsn.msg == "update sukses"){
+                    document.getElementById(`#${kodeItem}`).value = jsn.qty;
+                  }else if(jsn.msg == "data kosong"){
+                    document.getElementById(`#${kodeItem}`).value = jsn.qty;
+                    console.log('belum ada data yang di pilih');
+                  }
+                  loadKeranjang();
+              }
+            }
+          xml.send(data);
       }
-      updateCartUI();
+
     }
 
-    function decrement(id) {
-      if (cart[id] && cart[id].qty > 0) {
-        cart[id].qty--;
-        if (cart[id].qty === 0) {
-          delete cart[id];
+  
+    function getMeja(){
+        const xml = new XMLHttpRequest();
+        const link        = "{{route('actionpesanan')}}";
+        let frmData       = new FormData();
+        frmData.append('action', 'getMeja');
+        frmData.append('kode',"{{Session::get('kodeTemp')}}");
+        xml.open('POST',link,true);
+        xml.setRequestHeader('X-CSRF-TOKEN',token);
+        xml.onreadystatechange = function(e) {
+          if(xml.status==200 && xml.readyState == 4){
+            try {
+                let res = xml.responseText;
+                const jsn   = JSON.parse(res);
+                
+                let   option= "";
+                if(jsn.jmlData > 0){
+                  for(let i =0; i < jsn.jmlData; i++){
+                    option += "<option value="+jsn.arrData[i].kodeMeja+">"+jsn.arrData[i].nomorMeja+"</option>";
+                  }
+                }
+                document.querySelector('#select_meja').innerHTML = option;
+            } catch (e) {
+                console.error("Error:", e);
+            }
+        } else if (xml.readyState == 4) {
+            console.error("Error HTTP:", xml.status);
         }
-        updateCartUI();
+    };
+        xml.send(frmData);
+    
+    }
+
+      function loadKeranjang() {
+        getKeranjang().then(renderCart).catch(console.error);
       }
-    }
-
-    function updateQtyFromInput(id, val) {
-      const qty = parseInt(val) || 0;
-      if (qty < 0) return;
-      if (qty === 0) {
-        delete cart[id];
-      } else {
-        if (!cart[id]) {
-          const item = MENU_DATA.find(i => i.id === id);
-          cart[id] = { ...item, qty: qty };
-        } else {
-          cart[id].qty = qty;
-        }
-      }
-      updateCartUI();
-    }
-
-    function removeFromCart(id) {
-      delete cart[id];
-      updateCartUI();
-    }
-
+    
+      const updateNavMeja = (e) => {
+        loadKeranjang();
+       }
+    
     function renderMenu() {
+      if(MENU_DATA.length < 1){
+        console.log("no Data Menu For Load");
+      }else if(MENU_DATA.length > 0){
       const grid = document.getElementById('food-menu-grid');
-
- 
       grid.innerHTML = MENU_DATA.map(item => {
         const cartItem = cart[item.id];
         const qty = cartItem ? cartItem.qty : 0;
@@ -432,35 +557,31 @@
         return `
           <div class="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-100 flex flex-col group card-transition">
             <div class="relative aspect-video overflow-hidden">
-              <img src="${item.img}" class="w-full h-full object-cover group-hover:scale-105 duration-700" alt="${item.name}">
-              ${item.popular ? `
-                <div class="absolute top-3 left-3">
-                  <span class="bg-white/95 px-2.5 py-1 rounded-xl text-[9px] font-black text-orange-600 shadow-sm border border-orange-50">POPULER</span>
-                </div>
-              ` : ''}
+              <img src="{{asset('folderUser')}}/${item.locationFile}" class="w-full h-full object-cover group-hover:scale-105 duration-700" alt="${item.namaItem}">
+         
             </div>
             <div class="p-6 flex-grow flex flex-col">
-              <h3 class="font-bold text-lg text-slate-800 mb-2 group-hover:text-orange-500 transition-colors">${item.name}</h3>
-              <p class="text-slate-500 text-xs sm:text-sm mb-6 leading-relaxed truncate-2">${item.desc}</p>
+              <h3 class="font-bold text-lg text-slate-800 mb-2 group-hover:text-orange-500 transition-colors">${item.namaItem}</h3>
+              <p class="text-slate-500 text-xs sm:text-sm mb-6 leading-relaxed truncate-2">Diskon = ${item.diskon} %</p>
               <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
-                <span class="text-orange-500 font-black text-xl">${formatRupiah(item.price)}</span>
+                <span class="text-orange-500 font-black text-xl">${formatRupiah(item.harga)}</span>
                 
                 <div class="flex items-center gap-3">
                   <!-- Tombol Minus Bulat Tipis -->
-                  <button onclick="decrement(${item.id})" class="w-8 h-8 flex items-center justify-center border border-slate-400 rounded-full text-slate-500 hover:border-slate-500 hover:text-slate-600 transition-all">
+                  <button onclick="decrement('${item.kodeTem}','${item.kodeItem}',${item.harga},${item.diskon},'${item.namaItem}')" class="w-8 h-8 flex items-center justify-center border border-slate-400 rounded-full text-slate-500 hover:border-slate-500 hover:text-slate-600 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                       <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                   </button>
                   
                   <!-- Input Kuantitas Bergaya Minimalis (Selalu Tampil) -->
-                  <input type="number" 
-                         value="${qty}" 
-                         onchange="updateQtyFromInput(${item.id}, this.value)"
+                  <input type="number" id="#${item.kodeItem}"
+                         value="" 
+                         onchange="updateQtyFromInput(${item.kodeItem})"
                          class="w-10 bg-transparent text-center text-lg font-bold text-orange-600 focus:outline-none border-none">
                   
                   <!-- Tombol Plus Bulat Biru Tipis -->
-                  <button onclick="increment(${item.id})" class="w-8 h-8 flex items-center justify-center border border-blue-500 rounded-full text-blue-500 hover:bg-blue-50 transition-all">
+                  <button onclick="increment('${item.kodeTem}','${item.kodeItem}',${item.harga},${item.diskon},'${item.namaItem}')" class="w-8 h-8 flex items-center justify-center border border-blue-500 rounded-full text-blue-500 hover:bg-blue-50 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                       <line x1="12" y1="5" x2="12" y2="19"></line>
                       <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -472,16 +593,126 @@
           </div>
         `;
       }).join('');
+      }
+     
     }
 
-    // Initialize
-    window.onload = () => {
-      renderMenu();
+const initApp = async () => {
+    try {
+        await getMeja();
+        await getData();
+        renderMenu();
+        console.log('✅ Ready!');
+    } catch (e) {
+        console.error('❌ Load failed:', e);
     }
+};
+initApp();
 
+let socket;
+let reconnectCount = 0;
+//const maxReconnects = 50;
+socket = new WebSocket("ws://localhost:10000/layanan?kodeTemp={{Session::get('kodeTemp')}}&userId={{Session::get('userId')}}&token="+token);
+socket.onopen = () => {
+  console.log("TERHUBUNG ✅");
+};
 
-    console.log(MENU_DATA);
-    getData();
-  </script>
+socket.onerror = (e) => {
+  console.log("ERROR ❌", e);
+};
+
+socket.onclose = () => {
+  console.log("CLOSED ❌", reconnectCount);
+ 
+    setTimeout(() => {
+        reconnectCount++;
+        console.log("🔄 Reconnect ke-" + reconnectCount + "...");
+        const newSocket = new WebSocket("ws://localhost:10000/layanan?kodeTemp={{Session::get('kodeTemp')}}&userId={{Session::get('userId')}}&token="+token);
+        newSocket.onopen = socket.onopen;
+        newSocket.onerror  = socket.onerror;
+        newSocket.onclose = socket.onclose;
+        newSocket.onmessage =  socket.onmessage;
+        socket= newSocket;
+    },5000)  
+  
+};
+
+socket.onmessage = function(e){
+    if(e.data == 'berhasil'){
+      loadKeranjang();
+      loadingStop();
+      document.getElementById('namaPelanggan').value = "";
+      Swal.fire({
+        title: "Transaksi suskes!",
+        text: "data telah disimpan",
+        icon: "success"
+      });
+    }
+  console.log(e.data);
+ }
+
+ const kirimPesanan = () => {
+    const xml         = new XMLHttpRequest();
+    const meja        = document.getElementById("mejaData").value; 
+    const user        = "{{Session::get('userId')}}";
+    const pelanggan   = document.getElementById('namaPelanggan').value;
+    const catatan     = document.getElementById('catatan_pesanan').value;
+    const data        =  `action=cekPesanan&meja=${meja}&user=${user}`;
+    const link        = "{{route('actionpesanan')}}";
+    xml.open('POST',link,true);
+    xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xml.setRequestHeader('X-CSRF-TOKEN',token);
+    xml.timeout = 15000; // 15s timeout
+    xml.onreadystatechange = function(){
+      if(xml.status == 200 && xml.readyState == 4){
+        const respon = xml.responseText;
+        if(respon === 'kosong'){
+            Swal.fire({
+                    icon  : "error",
+                    title : "oops",
+                    text  : "Anda belum memilih pesanan",
+                    showConfirmButton: true
+             });
+        }else if(respon === "ada"){
+          if(socket.readyState === WebSocket.OPEN){
+            if(pelanggan == ""){
+                  Swal.fire({
+                    icon  : "warning",
+                    title : "oops",
+                    text  : "Nama Pemesan Belum Di isi, isi nama pemesan terlebih dahulu !",
+                    showConfirmButton: true,
+                      didClose: () => {
+                       document.getElementById("namaPelanggan").focus(); 
+                    }
+             });
+            }else if(pelanggan != ""){
+              loadingStart();
+              const jsnData = JSON.stringify({
+                action : "savePesanan",
+                meja   : meja,
+                user   : user,
+                namaPelanggan : pelanggan,
+                catatan : catatan,
+                kodeTemp : "{{Session::get('kodeTemp')}}"
+            })
+            socket.send(jsnData);
+            }
+        
+          }else{
+                    Swal.fire({
+                    icon  : "error",
+                    title : "oops",
+                    text  : "Tidak terkoneksi ke server tidak dapat melanjutkan proses",
+                    showConfirmButton: true
+             });
+          }
+      
+        }
+      }
+    }
+    xml.send(data);
+ }
+</script>
+
 </body>
 </html>

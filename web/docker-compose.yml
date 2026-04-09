@@ -9,6 +9,7 @@ services:
       - .:/app
       - ./Caddyfile:/etc/caddy/Caddyfile
       - /app/node_modules  # Exclude node_modules dari mount
+      
     environment:
       DB_CONNECTION: mysql
       DB_HOST: 127.0.0.1
@@ -16,6 +17,9 @@ services:
       DB_DATABASE: projectapp
       DB_USERNAME: root
       DB_PASSWORD: Mysql@123
+
+
+      
       
   
       
