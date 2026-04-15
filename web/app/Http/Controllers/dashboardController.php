@@ -245,13 +245,18 @@ class dashboardController extends Controller
      $action = $req->input('action');
         switch($action){
             case 'loadData' :
-                $kode_temp = Session::get('kodeTemp');
-                $cek       = DB::table('tabel_item')->where('kode_temp', $kode_temp)->count();
+                $kode_temp      = Session::get('kodeTemp');
+                $cari           = $req->input('cari');
+                $query          = DB::table('tabel_item')->where('kode_temp', $kode_temp);
+                if(!empty($cari)){
+                    $query->where('nama_item', 'LIKE', '%' . $cari . '%');
+                }
+                $cek = $query->count();
                 $arrData = array("jumlah_data" => $cek,
                                   "arr" => array());
                 if($cek >= 1){
-                    $query     = "SELECT * FROM tabel_item WHERE kode_temp='$kode_temp'";
-                    $getData   = DB::select(DB::raw($query));
+                    
+                    $getData   = $query->get();
                     foreach($getData As $index => $value){
                         $gabung[] = array(
                              "kodeTem" => $value->kode_temp, 
@@ -472,6 +477,53 @@ class dashboardController extends Controller
                                  echo "kosong";
                             }                 
                             break;
+        }
+    }
+
+    public function actDapur(Request $req){
+        $action = $req->input('action');
+        switch($action){
+            case 'loadData' :
+                $kodeTemp = Session::get('kodeTemp');
+                $query    = DB::table('tblPenjualan')->where('kode_temp', $kodeTemp)->where('statPesanan','belum dimasak');
+                if($query->count() < 1){
+                    $arrData = array(
+                        "jmlData" => $query->count(),
+                        "load"    => array()
+                    );
+                }elseif($query->count() > 0){
+                    $getData = $query->get();
+                    $gb = collect();
+                    foreach($getData As $index => $value){
+                        $gbTmp = collect();
+                        $queryItem = DB::table('tmp_penjualan')->where('no_penjualan' , $value->no_penjualan);
+                        $getItem = $queryItem->get();
+                        foreach($getItem  As $idxtmp => $valueTmp){
+                            
+                            $gbTmp->push([
+                                'namaItem' => $valueTmp->nama_item,
+                                'harga' => $valueTmp->harga_jual,
+                                'qty'   => $valueTmp->qty
+                            ]);
+                        }
+                        $gb->push([
+                            'kodeTemp' => $value->kode_temp,
+                            'no_penjualan' => $value->no_penjualan,
+                            'pelanggan' => $value->namaPelanggan,
+                            'subtotal' => $value->subtotal,
+                            'waktuPesan' => $value->tglTrans,
+                            'statusPesanan' => $value->statPesanan,
+                            'loadItem' => $gbTmp
+                        ]);
+                    }
+                    $arrData = array(
+                        "jmlData" => $query->count(),
+                        "load"    => $gb
+                    );
+                }
+
+                echo json_encode($arrData);
+                break;
         }
     }
 }

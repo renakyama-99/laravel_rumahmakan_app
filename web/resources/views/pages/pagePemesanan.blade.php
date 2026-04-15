@@ -113,7 +113,7 @@
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input type="text" placeholder="Cari menu..." class="bg-transparent border-none focus:outline-none w-full ml-3 text-sm">
+        <input type="text" id="searchMenu"  oninput="cariData()" placeholder="Cari menu..." class="bg-transparent border-none focus:outline-none w-full ml-3 text-sm">
       </div>
 
       <div class="flex items-center gap-3">
@@ -139,7 +139,7 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" placeholder="Cari makanan..." class="bg-transparent border-none focus:outline-none w-full text-sm">
+          <input type="text"  placeholder="Cari makanan..." class="bg-transparent border-none focus:outline-none w-full text-sm">
         </div>
 
         <section>
@@ -151,7 +151,7 @@
              <div class="flex mb-6">
                   <select id="mejaData"
                        
-                      onchange="updateNavMeja(this.value)" 
+                      onchange="updateNavMeja()" 
                       class="block w-full appearance-none cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 pr-10 text-sm font-medium text-slate-700 transition-all focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 hover:border-slate-300"
                     > 
                     <option value="" disabled selected>Pilih Nomor Meja</option> 
@@ -269,11 +269,13 @@
       loadingStop();
       let token = document.querySelector('meta[name="csrf-token"]').content;
       let MENU_DATA = [];
+
 const getData = () => {
     return new Promise((resolve, reject) => {
         const xml = new XMLHttpRequest();
         const link = "{{route('actionpesanan')}}";
-        const data = "action=loadData";
+        const search = document.getElementById('searchMenu').value;
+        const data = "action=loadData&cari="+search;
         
         // 🚀 Prioritas tinggi + no cache
         xml.open('POST', link, true);
@@ -288,6 +290,7 @@ const getData = () => {
                         const jsn = JSON.parse(xml.responseText);
                         MENU_DATA = jsn.arr || [];
                         console.log(`✅ ${MENU_DATA.length} items loaded`);
+                        renderMenu(); 
                         resolve(jsn);
                     } catch (e) {
                         reject(new Error('JSON Parse Error'));
@@ -597,6 +600,13 @@ const renderCart = (json) => {
      
     }
 
+const cariData = async () => {
+    try {
+        await getData();
+    } catch(e) {
+        console.error('Search failed:', e);
+    }
+};
 const initApp = async () => {
     try {
         await getMeja();
@@ -611,8 +621,9 @@ initApp();
 
 let socket;
 let reconnectCount = 0;
-//const maxReconnects = 50;
-socket = new WebSocket("ws://localhost:10000/layanan?kodeTemp={{Session::get('kodeTemp')}}&userId={{Session::get('userId')}}&token="+token);
+const kodeTemp  = "{{ Session::get('kodeTemp') }}";
+const userId    = "{{ Session::get('userId') }}";
+socket = new WebSocket("ws://localhost:10000/layanan?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
 socket.onopen = () => {
   console.log("TERHUBUNG ✅");
 };
@@ -623,11 +634,10 @@ socket.onerror = (e) => {
 
 socket.onclose = () => {
   console.log("CLOSED ❌", reconnectCount);
- 
     setTimeout(() => {
         reconnectCount++;
-        console.log("🔄 Reconnect ke-" + reconnectCount + "...");
-        const newSocket = new WebSocket("ws://localhost:10000/layanan?kodeTemp={{Session::get('kodeTemp')}}&userId={{Session::get('userId')}}&token="+token);
+        console.log("Reconnect ke-" + reconnectCount + "...");
+        const newSocket = new WebSocket("ws://localhost:10000/layanan?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
         newSocket.onopen = socket.onopen;
         newSocket.onerror  = socket.onerror;
         newSocket.onclose = socket.onclose;
@@ -699,7 +709,7 @@ socket.onmessage = function(e){
             }
         
           }else{
-                    Swal.fire({
+                Swal.fire({
                     icon  : "error",
                     title : "oops",
                     text  : "Tidak terkoneksi ke server tidak dapat melanjutkan proses",

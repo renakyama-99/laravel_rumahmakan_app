@@ -81,3 +81,5 @@ Route::get('pesanan', function(){
 
 Route::post('/pesanan/actionPesanan',[dashboardController::class, 'act_pesanan'])->name('actionpesanan')->middleware('authEmail');
 Route::get('/dapur', function() { return view('pages.dapur');})->name('halDapur')->middleware('authEmail');
+Route::post('/dapur/actionDapur',[dashboardController::class, 'actDapur'])->name('actionDapur')->middleware('authEmail');
+Route::get('/dapur/orderMonitor', function() {  return view('pages.dapurOrder'); })->name('dapur_order')->middleware('authEmail');

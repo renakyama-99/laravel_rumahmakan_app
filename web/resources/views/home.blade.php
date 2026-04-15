@@ -164,6 +164,9 @@
                     <li class="nav-item">
                         <a  class="nav-link"  href="{{ route('pagePesanan') }}">Pemesanan</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('dapur_order') }}">Dapur Monitoring</a>
+                    </li>
                 </ul>
             </div>
       </li>
