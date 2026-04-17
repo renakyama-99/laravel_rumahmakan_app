@@ -40,7 +40,7 @@
                         const jsn = JSON.parse(res);
                         console.log(jsn);
                         data_pesanan = jsn.load || [];
-                        renderPesanan();
+                       
                         resolve(jsn);
                     } catch (e) {
                         reject(new Error('JSON Parse Error'));
@@ -160,14 +160,19 @@
         const userId    = "{{ Session::get('userId') }}";
         socket = new WebSocket("ws://localhost:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
         socket.onopen = () => {
+             const stat = document.getElementById('statConnection');
+             stat.innerHTML = '<p class="text-xs text-emerald-600 font-semibold">Online</p>';
              console.log("TERHUBUNG ✅");
         }
 
         socket.onerror = (e) => {
+            
             console.log("ERROR ❌", e);
         };
 
         socket.onclose = () => {
+             const stat = document.getElementById('statConnection');
+             stat.innerHTML = '<p class="text-xs text-rose-600 font-semibold">Offline</p>';
              console.log("CLOSED ❌", reconnectCount);
              setTimeout(() =>{
                 reconnectCount++;
@@ -211,6 +216,13 @@
         }
 
        }
-       
+
+       const statConnection = () => {
+        if(socket.readyState !== WebSocket.OPEN){
+            const stat = document.getElementById('statConnection');
+            stat.innerHTML = '<p class="text-xs text-rose-600 font-semibold">Offline</p>';
+         }
+       }
+    statConnection();
 </script>
 @endsection

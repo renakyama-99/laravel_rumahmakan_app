@@ -57,14 +57,14 @@
                 </div>
 
                 <div class="flex items-center gap-2 lg:gap-4">
+                    @yield('picker')
                     <button class="p-2 hover:bg-slate-100 rounded-full relative">
                         <i class="fa-solid fa-bell text-slate-600"></i>
                         <span class="absolute top-1.5 right-1.5 size-2 bg-rose-500 rounded-full border-2 border-white"></span>
                     </button>
                     <div class="h-8 w-px bg-slate-200 mx-2 hidden sm:block"></div>
-                    <div class="hidden sm:block text-right">
-                        <p class="text-sm font-medium">Restoran Utama</p>
-                        <p class="text-xs text-emerald-600 font-semibold">Online</p>
+                    <div class="hidden sm:block text-right" id="statConnection">
+
                     </div>
                 </div>
             </header>
@@ -73,37 +73,24 @@
             <div class="flex-1 overflow-y-auto p-4 lg:p-8">
                     <!-- Tabs / Filter -->
                     <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
-                        <a  href="{{ route('dapur_order') }}" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Menunggu</a>
-                        <a  href="{{route('halDapur')}}" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Selesai</a>
-                    </div>
-                    <div class="flex items-center bg-slate-100 rounded-full px-4 py-2 gap-2 w-48 sm:w-64 lg:w-96">
-                        <i class="fa-solid fa-magnifying-glass text-xs text-slate-400"></i>
-                        <input 
-                            type="text" 
-                            x-model="searchQuery"
-                            @input="renderAll()"
-                            placeholder="Cari pesanan..." 
-                            class="bg-transparent border-none focus:ring-0 text-sm w-full outline-none"
-                        >
-                    </div>
+                        <button @click="activeTab = 'all'" :class="activeTab === 'all' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Semua</button>
+                        <button @click="activeTab = 'pending'" :class="activeTab === 'pending' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Menunggu</button>
+                        <button @click="activeTab = 'preparing'" :class="activeTab === 'preparing' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Dimasak</button>
+                        <button @click="activeTab = 'ready'" :class="activeTab === 'ready' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Siap Saji</button>
+                        <button @click="activeTab = 'delivered'" :class="activeTab === 'delivered' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Selesai</button>
+                    </div>                  
                     <div class="flex items-center rounded-full px-4 py-2 gap-2 w-48 sm:w-64 lg:w-96">
                         @yield('head_content')
-                        
                     </div>
                 <div class="max-w-7xl mx-auto space-y-8">
-                    
-                    <!-- Stats Overview -->
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4" id="stats-container">
-                        <!-- Stats will be injected here via innerHTML -->
-                    </div>
-
-
-
                     <!-- Orders Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-5" id="orders-grid">
                         <!-- Orders will be injected here via innerHTML -->
                     </div>
                 </div>
+                <div id="orders-container">
+                        <!-- Orders will be injected here via innerHTML -->
+                </div
             </div>
         </main>
     </div>

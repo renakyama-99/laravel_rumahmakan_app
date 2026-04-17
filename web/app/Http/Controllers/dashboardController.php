@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use DB;
 use Session;
 use Illuminate\Support\Facades\File;
+use Carbon\Carbon;
 class dashboardController extends Controller
 {
     public function home(){
@@ -524,6 +525,77 @@ class dashboardController extends Controller
 
                 echo json_encode($arrData);
                 break;
+
+                case 'loadDoneData':
+                        
+                        $tgl    = $req->input('date');
+                        $kodeTemp = Session::get('kodeTemp');
+                        $batas = 2;
+                        if($req->input('hal') == ""){
+                            $hal = 1;
+                        }else{
+                            $hal = $req->input('hal');
+                        }
+                        $offset = ($hal - 1) * $batas;
+                        $query = DB::table('tblPenjualan')->where('kode_temp', $kodeTemp)->where('statPesanan', 'sudah dimasak');
+                        if($tgl != ""){
+                            $split = explode(' to ', $tgl);
+                            $countSplit = count($split);
+                            if($countSplit == 2){
+                                $startDate = trim($split[0]);
+                                $endDate = trim($split[1]);
+                                $query = $query->whereBetween('tglTrans', [
+                                    Carbon::parse($startDate)->startOfDay() , Carbon::parse($endDate)->endOfDay()
+                                ]);
+                            }elseif($countSplit == 1){
+                                $date = trim($split[0]);
+                                $query = $query->whereBetween('tglTrans', [
+                                    Carbon::parse($date)->startOfDay() , Carbon::parse($date)->endOfDay()
+                                ]);
+                            }
+                        }
+                        $count  = $query->count();
+                        $jmlHalaman = ceil($count /$batas);
+                        $getData    = $query->offset($offset)->limit($batas)->get();
+                        if($count > 0){
+                            $gabung = collect();
+                            foreach($getData As $idx => $val){
+                                $gbTmp = collect();
+                                $queryItem = DB::table('tmp_penjualan')->where('no_penjualan' , $val->no_penjualan)->get();
+                                foreach($queryItem As $idxTmp => $valTmp){
+                                    $gbTmp->push([
+                                        'namaItem' => $valTmp->nama_item,
+                                        'harga' => $valTmp->harga_jual,
+                                        'qty'   => $valTmp->qty
+                                    ]);
+                                }
+                                $gabung->push([
+                                        'kodeTemp' => $val->kode_temp,
+                                        'no_penjualan' => $val->no_penjualan,
+                                        'pelanggan' => $val->namaPelanggan,
+                                        'subtotal' => $val->subtotal,
+                                        'waktuPesan' => $val->tglTrans,
+                                        'statusPesanan' => $val->statPesanan,
+                                        'loadItem' => $gbTmp
+                                    ]);
+                            }
+                            $arrData = array(
+                                'jmlData' => $count,
+                                'jmlHalaman' => $jmlHalaman,
+                                'halAktif'  => $hal,
+                                'loadData' =>  $gabung
+                            );
+                        }else{
+                            $arrData = array(
+                                'jmlData' => $count,
+                                'jmlHalaman' => $jmlHalaman,
+                                'halAktif'  => $hal,
+                                'loadData' =>  array()
+                            );
+                        }
+
+                        echo json_encode($arrData);
+                    break;
         }
     }
 }
