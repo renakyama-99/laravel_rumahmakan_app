@@ -53,6 +53,7 @@ const getDoneData = () => {
                  if (xml.status === 200) {
                     try {
                         const res = xml.responseText;
+                        //console.log(res);
                         const jsn = JSON.parse(res);
                         data_pesanan = jsn || [];
                         
@@ -69,6 +70,22 @@ const getDoneData = () => {
         xml.onerror = () => reject(new Error('Network Error'));
         xml.send(data);
     })
+}
+
+function getTimeAgo(dateString) {
+                           const diffInMs = Date.now() - new Date(dateString).getTime();
+    
+                            const seconds = Math.floor(diffInMs / 1000);
+                            const minutes = Math.floor(seconds / 60);
+                            const hours = Math.floor(minutes / 60);
+                            const days = Math.floor(hours / 24);
+                            const weeks = Math.floor(days / 7);
+                            
+                            if (seconds < 60) return `${seconds}s yang lalu`;
+                            if (minutes < 60) return `${minutes}m yang lalu`;
+                            if (hours < 24) return `${hours}j yang lalu`;
+                            if (days < 7) return `${days}h yang lalu`;
+                            return `${weeks}mg yang lalu`;
 }
 
 const renderTabel = () => {
@@ -95,30 +112,86 @@ const renderTabel = () => {
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Waktu</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Total</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                            
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                        
+                                ${data_pesanan.loadData.map(val => `
+                                    <tr class="hover:bg-slate-50 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <span class="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">${val.no_penjualan}</span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm font-bold text-slate-800">${val.pelanggan}</div>
+                                            <div class="text-xs text-slate-500">${val.noMeja}</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                           <div class="max-w-xs">
+                                                ${val.loadItem.map(item => `
+                                                    <div class="text-xs text-slate-600 truncate">
+                                                        <span class="font-bold">${item.qty}x</span> ${item.namaItem}
+                                                    </div>
+                                                `).join('')}
+                                           </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                                <div class="text-sm text-slate-600">${getTimeAgo(val.waktuPesan)}</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span class="text-[10px] font-bold px-2 py-1 rounded-full border flex items-center gap-1 w-fit bg-emerald-100 text-emerald-700 border-emerald-200">
+                                                <i class="fa-solid fa-circle-check text-[10px]"></i>
+                                                <span>${val.statusPesanan}</span>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span class="text-sm font-black text-slate-900">Rp ${val.subtotal.toLocaleString()}</span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
                         </tbody>
                 </table>
             </div>
             <!-- Pagination -->
             <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-2">  
-                        <button onclick="window.changePage(${data_pesanan.halAktif - 1})"
-                                ${data_pesanan.halAktif === 1 ? 'disabled' : ''}
-                                class="size-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                <i class="fa-solid fa-chevron-left text-[10px]"></i>
-                        </button>
-                        <div class="flex items-center gap-1" id="item_pagination">
 
+                        <div class="flex items-center gap-1" id="item_pagination">
+                            ${createPagination(data_pesanan.halAktif,data_pesanan.jmlHalaman)}
                         </div>
                 </div>
             </div>
         </div>
     `;
+}
+const createPagination = (currentPage, totalPage) => {
+    let  page  = "";   
+    const  prev     = (currentPage > 1) ? `<button onclick="window.changePage(${currentPage - 1}) class="size-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">
+                         <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                    </button>` : '' ;
+    
+    
+    for(let i = 1; i <= totalPage; i++){
+        if((i >= (currentPage - 2)) && (i <= (currentPage + 2))){
+            if(currentPage == i){
+                page += `<button onclick="window.changePage('${i}')" class="px-4 py-2 size-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md shadow-indigo-100">
+                            ${i}
+                        </button>`;
+            }else{
+                page += `<button onclick="window.changePage('${i}')" class="px-4 py-2 size-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all bg-white border border-slate-200 text-slate-600 hover:border-indigo-300">
+                             ${i}
+                        </button>`;
+            }
+        }
+    }
+    
+    const next    = (currentPage < totalPage) ? `<button 
+                                onclick="window.changePage(${currentPage + 1})"
+                                class="size-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </button>` : '';
+    return  prev+page+next;                  
+
 }
 const terapkanTgl = () => {
    run(); 

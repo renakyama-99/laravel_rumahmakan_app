@@ -124,11 +124,11 @@ function validasiToken(token, callback){
         
          let insertSubtotal = sumSubtotal.reduce((a,b) => a + b,0);
          const dateTime      = mysqlDateTime();
-         const query_single_input = `INSERT INTO tblPenjualan(kode_temp,no_penjualan,namaPelanggan,user_id,subtotal,keterangan,status,statPesanan,tglTrans) VALUES (?,?,?,?,?,?,?,?,?)`;
-         const inserTblPejualan = await queryPromise(query_single_input,[kodeTempat,code,pelanggan,msg.user,insertSubtotal,msg.catatan,"belum bayar","belum dimasak",dateTime]);                           
+         const query_single_input = `INSERT INTO tblPenjualan(kode_temp,no_penjualan,namaPelanggan,user_id,kodeMeja,subtotal,keterangan,status,statPesanan,tglTrans) VALUES (?,?,?,?,?,?,?,?,?,?)`;
+         const inserTblPejualan = await queryPromise(query_single_input,[kodeTempat,code,pelanggan,msg.user,msg.meja,insertSubtotal,msg.catatan,"belum bayar","belum dimasak",dateTime]);                           
          const multiInsert      = await queryPromise(multipleInput,[valuesTmp_penjualan]);
          const deleteTmpPesanan = await queryPromise("DELETE FROM tmp_pesanan WHERE kode_temp = ? AND user = ? AND kode_meja = ?",[kodeTempat,msg.user,msg.meja]);
-         
+          console.log(msg.meja);
         CLIENTS.forEach((item,index) => {
             if(item.kodeTemp == kodeTempat && item.userId == msg.user && item.path == ws.path){
                 item.send('berhasil');

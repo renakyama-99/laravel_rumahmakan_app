@@ -156,9 +156,10 @@
 
         let socket;
         let reconnectCount = 0;
+        let maxReconnection = 20;
         const kodeTemp  = "{{ Session::get('kodeTemp') }}";
         const userId    = "{{ Session::get('userId') }}";
-        socket = new WebSocket("ws://localhost:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
+        socket = new WebSocket("ws://192.168.68.72:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
         socket.onopen = () => {
              const stat = document.getElementById('statConnection');
              stat.innerHTML = '<p class="text-xs text-emerald-600 font-semibold">Online</p>';
@@ -174,16 +175,25 @@
              const stat = document.getElementById('statConnection');
              stat.innerHTML = '<p class="text-xs text-rose-600 font-semibold">Offline</p>';
              console.log("CLOSED ❌", reconnectCount);
-             setTimeout(() =>{
-                reconnectCount++;
-                console.log(" Reconnect ke-" + reconnectCount + "...");
-                const newSocket     = new WebSocket("ws://localhost:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
-                newSocket.onopen    = socket.onopen;
-                newSocket.onerror   = socket.onerror;
-                newSocket.onclose   = socket.onclose;
-                newSocket.onmessage = socket.onmessage;
-                socket = newSocket;
-             }, 5000);
+             if(maxReconnection >= reconnectCount){
+                    setTimeout(() =>{
+                        reconnectCount++;
+                        console.log(" Reconnect ke-" + reconnectCount + "...");
+                        const newSocket     = new WebSocket("ws://192.168.68.72:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
+                        newSocket.onopen    = socket.onopen;
+                        newSocket.onerror   = socket.onerror;
+                        newSocket.onclose   = socket.onclose;
+                        newSocket.onmessage = socket.onmessage;
+                        socket = newSocket;
+                    }, 5000);
+                }
+                else{
+                    Swal.fire({
+                        icon : 'question',
+                        title : 'connection',
+                        text : 'gagal menghubungkan ke server, coba logout kemudian login kembali !'
+                    })
+                }
         }
 
         socket.onmessage = (e) => {

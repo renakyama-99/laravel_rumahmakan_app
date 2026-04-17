@@ -530,6 +530,7 @@ class dashboardController extends Controller
                         
                         $tgl    = $req->input('date');
                         $kodeTemp = Session::get('kodeTemp');
+                    
                         $batas = 2;
                         if($req->input('hal') == ""){
                             $hal = 1;
@@ -537,32 +538,37 @@ class dashboardController extends Controller
                             $hal = $req->input('hal');
                         }
                         $offset = ($hal - 1) * $batas;
-                        $query = DB::table('tblPenjualan')->where('kode_temp', $kodeTemp)->where('statPesanan', 'sudah dimasak');
+                       $query = DB::table('tblPenjualan')
+                                    ->leftJoin('tabel_meja', 'tblPenjualan.kodeMeja', '=', 'tabel_meja.kode_meja')
+                                    ->where('tblPenjualan.kode_temp', $kodeTemp)      
+                                    ->where('tblPenjualan.statPesanan', 'sudah dimasak')  
+                                    ->select('tblPenjualan.*', 'tabel_meja.nomor_meja');
                         if($tgl != ""){
                             $split = explode(' to ', $tgl);
                             $countSplit = count($split);
                             if($countSplit == 2){
                                 $startDate = trim($split[0]);
                                 $endDate = trim($split[1]);
-                                $query = $query->whereBetween('tglTrans', [
+                                $query = $query->whereBetween('tblPenjualan.tglTrans', [
                                     Carbon::parse($startDate)->startOfDay() , Carbon::parse($endDate)->endOfDay()
                                 ]);
                             }elseif($countSplit == 1){
                                 $date = trim($split[0]);
-                                $query = $query->whereBetween('tglTrans', [
+                                $query = $query->whereBetween('tblPenjualan.tglTrans', [
                                     Carbon::parse($date)->startOfDay() , Carbon::parse($date)->endOfDay()
                                 ]);
                             }
                         }
+
                         $count  = $query->count();
                         $jmlHalaman = ceil($count /$batas);
                         $getData    = $query->offset($offset)->limit($batas)->get();
                         if($count > 0){
                             $gabung = collect();
-                            foreach($getData As $idx => $val){
+                            foreach($getData as $idx => $val){
                                 $gbTmp = collect();
                                 $queryItem = DB::table('tmp_penjualan')->where('no_penjualan' , $val->no_penjualan)->get();
-                                foreach($queryItem As $idxTmp => $valTmp){
+                                foreach($queryItem as $idxTmp => $valTmp){
                                     $gbTmp->push([
                                         'namaItem' => $valTmp->nama_item,
                                         'harga' => $valTmp->harga_jual,
@@ -572,6 +578,7 @@ class dashboardController extends Controller
                                 $gabung->push([
                                         'kodeTemp' => $val->kode_temp,
                                         'no_penjualan' => $val->no_penjualan,
+                                         'noMeja' => $val->nomor_meja,
                                         'pelanggan' => $val->namaPelanggan,
                                         'subtotal' => $val->subtotal,
                                         'waktuPesan' => $val->tglTrans,
@@ -594,7 +601,7 @@ class dashboardController extends Controller
                             );
                         }
 
-                        echo json_encode($arrData);
+                        return response()->json($arrData);
                     break;
         }
     }
