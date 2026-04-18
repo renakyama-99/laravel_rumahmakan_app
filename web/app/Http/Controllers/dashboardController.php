@@ -486,7 +486,10 @@ class dashboardController extends Controller
         switch($action){
             case 'loadData' :
                 $kodeTemp = Session::get('kodeTemp');
-                $query    = DB::table('tblPenjualan')->where('kode_temp', $kodeTemp)->where('statPesanan','belum dimasak');
+                $query    = DB::table('tblPenjualan')
+                            ->leftJoin('tabel_meja', 'tblPenjualan.kodeMeja', '=', 'tabel_meja.kode_meja')
+                            ->where('tblPenjualan.kode_temp', $kodeTemp)->where('tblPenjualan.statPesanan','belum dimasak')
+                            ->select('tblPenjualan.*', 'tabel_meja.nomor_meja');
                 if($query->count() < 1){
                     $arrData = array(
                         "jmlData" => $query->count(),
@@ -510,6 +513,7 @@ class dashboardController extends Controller
                         $gb->push([
                             'kodeTemp' => $value->kode_temp,
                             'no_penjualan' => $value->no_penjualan,
+                            'nomorMeja' => $value->nomor_meja,
                             'pelanggan' => $value->namaPelanggan,
                             'subtotal' => $value->subtotal,
                             'waktuPesan' => $value->tglTrans,
@@ -531,7 +535,7 @@ class dashboardController extends Controller
                         $tgl    = $req->input('date');
                         $kodeTemp = Session::get('kodeTemp');
                     
-                        $batas = 2;
+                        $batas = 10;
                         if($req->input('hal') == ""){
                             $hal = 1;
                         }else{

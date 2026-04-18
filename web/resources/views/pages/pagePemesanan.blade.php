@@ -624,7 +624,7 @@ let reconnectCount = 0;
 let maxReconnection = 20;
 const kodeTemp  = "{{ Session::get('kodeTemp') }}";
 const userId    = "{{ Session::get('userId') }}";
-socket = new WebSocket("ws://192.168.68.72:10000/layanan?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
+socket = new WebSocket("ws://localhost:10000/layanan?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
 socket.onopen = () => {
   console.log("TERHUBUNG ✅");
 };
@@ -639,7 +639,7 @@ socket.onclose = () => {
         setTimeout(() => {
             reconnectCount++;
             console.log("Reconnect ke-" + reconnectCount + "...");
-            const newSocket = new WebSocket("ws://192.168.68.72:10000/layanan?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
+            const newSocket = new WebSocket("ws://localhost:10000/layanan?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
             newSocket.onopen = socket.onopen;
             newSocket.onerror  = socket.onerror;
             newSocket.onclose = socket.onclose;

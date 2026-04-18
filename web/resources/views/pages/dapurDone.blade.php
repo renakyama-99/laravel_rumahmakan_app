@@ -37,11 +37,11 @@
 <script>
 let token = document.querySelector('meta[name="csrf-token"]').content;
 let data_pesanan = [];
-const getDoneData = () => {
+const getDoneData = (hal) => {
     return new Promise((resolve,reject) => {
         const xml = new XMLHttpRequest();
         const link = "{{route('actionDapur')}}";
-        const page = "";
+        const page = hal;
         const date = document.getElementById('date-input').value;
         const data = "action=loadDoneData&hal="+page+"&date="+date;
         xml.open('POST', link, true);
@@ -153,8 +153,7 @@ const renderTabel = () => {
             </div>
             <!-- Pagination -->
             <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-2">  
-
+                <div class="flex items-center gap-2">
                         <div class="flex items-center gap-1" id="item_pagination">
                             ${createPagination(data_pesanan.halAktif,data_pesanan.jmlHalaman)}
                         </div>
@@ -165,7 +164,7 @@ const renderTabel = () => {
 }
 const createPagination = (currentPage, totalPage) => {
     let  page  = "";   
-    const  prev     = (currentPage > 1) ? `<button onclick="window.changePage(${currentPage - 1}) class="size-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">
+    const  prev     = (currentPage > 1) ? `<button onclick="changePage('${currentPage - 1}')" class="size-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">
                          <i class="fa-solid fa-chevron-left text-[10px]"></i>
                     </button>` : '' ;
     
@@ -173,11 +172,11 @@ const createPagination = (currentPage, totalPage) => {
     for(let i = 1; i <= totalPage; i++){
         if((i >= (currentPage - 2)) && (i <= (currentPage + 2))){
             if(currentPage == i){
-                page += `<button onclick="window.changePage('${i}')" class="px-4 py-2 size-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md shadow-indigo-100">
+                page += `<button onclick="changePage('${i}')" class="px-4 py-2 size-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md shadow-indigo-100">
                             ${i}
                         </button>`;
             }else{
-                page += `<button onclick="window.changePage('${i}')" class="px-4 py-2 size-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all bg-white border border-slate-200 text-slate-600 hover:border-indigo-300">
+                page += `<button onclick="changePage('${i}')" class="px-4 py-2 size-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all bg-white border border-slate-200 text-slate-600 hover:border-indigo-300">
                              ${i}
                         </button>`;
             }
@@ -185,7 +184,7 @@ const createPagination = (currentPage, totalPage) => {
     }
     
     const next    = (currentPage < totalPage) ? `<button 
-                                onclick="window.changePage(${currentPage + 1})"
+                                onclick="changePage(${currentPage + 1})"
                                 class="size-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
@@ -198,13 +197,21 @@ const terapkanTgl = () => {
 }
 const run = async() => {
     try{
-        await getDoneData();
+        await getDoneData('');
         renderTabel();
     }catch(e){
         console.log(e);
     }
 }
 
+const changePage = async (e) => {
+    try{
+        await getDoneData(e);
+        renderTabel();
+    }catch(e){
+        console.log(e);
+    }
+}
 run();
 </script>
 

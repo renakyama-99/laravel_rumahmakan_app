@@ -41,44 +41,56 @@
 </head>
 <body class="bg-slate-50 text-slate-900" >
     <div class="min-h-screen flex flex-col">
-        
         <!-- Main Content -->
         <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Header -->
-            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30">
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-3 mr-4">
-                        <div class="size-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                            <i class="fa-solid fa-utensils text-lg"></i>
+            <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+                <div class="h-16 px-4 lg:px-8 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="size-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                                <i class="fa-solid fa-utensils text-lg"></i>
+                            </div>
+                            <span class="font-bold text-xl tracking-tight hidden xl:block">FoodMonitor</span>
                         </div>
-                        <span class="font-bold text-xl tracking-tight hidden sm:block">FoodMonitor</span>
                     </div>
 
+                    <div class="flex items-center gap-2 lg:gap-4 ml-auto">
+                     @yield('picker')
+                        
+
+                        <button class="p-2 hover:bg-slate-100 rounded-full relative">
+                            <i class="fa-solid fa-bell text-slate-600"></i>
+                            <span class="absolute top-1.5 right-1.5 size-2 bg-rose-500 rounded-full border-2 border-white"></span>
+                        </button>
+                        <div class="h-8 w-px bg-slate-200 mx-2 hidden sm:block"></div>
+                        <div class="hidden sm:block text-right">
+                            <div id="tx-stat">
+                                
+                            </div>
+                            <div class="hidden sm:block text-right" id="statConnection">
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-2 lg:gap-4">
-                    @yield('picker')
-                    <button class="p-2 hover:bg-slate-100 rounded-full relative">
-                        <i class="fa-solid fa-bell text-slate-600"></i>
-                        <span class="absolute top-1.5 right-1.5 size-2 bg-rose-500 rounded-full border-2 border-white"></span>
-                    </button>
-                    <div class="h-8 w-px bg-slate-200 mx-2 hidden sm:block"></div>
-                    <div class="hidden sm:block text-right" id="statConnection">
-
+                <!-- Tabs Filter (Unified row for all devices) -->
+                <div class="border-t border-slate-100 px-4 lg:px-8 py-2 bg-slate-50/50">
+                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                        <button @click="activeTab = 'all'" :class="activeTab === 'all' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Semua</button>
+                        <button @click="activeTab = 'pending'" :class="activeTab === 'pending' ? 'bg-amber-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Menunggu</button>
+                        <button @click="activeTab = 'preparing'" :class="activeTab === 'preparing' ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Dimasak</button>
+                        <button @click="activeTab = 'ready'" :class="activeTab === 'ready' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Siap Saji</button>
+                        <button @click="activeTab = 'delivered'" :class="activeTab === 'delivered' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Selesai</button>
                     </div>
+
                 </div>
             </header>
 
             <!-- Dashboard Content -->
             <div class="flex-1 overflow-y-auto p-4 lg:p-8">
-                    <!-- Tabs / Filter -->
-                    <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
-                        <button @click="activeTab = 'all'" :class="activeTab === 'all' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Semua</button>
-                        <button @click="activeTab = 'pending'" :class="activeTab === 'pending' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Menunggu</button>
-                        <button @click="activeTab = 'preparing'" :class="activeTab === 'preparing' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Dimasak</button>
-                        <button @click="activeTab = 'ready'" :class="activeTab === 'ready' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Siap Saji</button>
-                        <button @click="activeTab = 'delivered'" :class="activeTab === 'delivered' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all">Selesai</button>
-                    </div>                  
+                  
                     <div class="flex items-center rounded-full px-4 py-2 gap-2 w-48 sm:w-64 lg:w-96">
                         @yield('head_content')
                     </div>

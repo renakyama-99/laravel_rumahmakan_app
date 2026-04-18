@@ -95,7 +95,7 @@
                                         <div class="flex items-center gap-3 mt-1 text-xs text-slate-500 font-medium">
                                             <span class="flex items-center gap-1">
                                                 <i class="fa-solid fa-utensils text-[10px]"></i>
-                                                <span></span>
+                                                <span>${item.nomorMeja}</span>
                                             </span>
                                             <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
                                             <span class="flex items-center gap-1">
@@ -159,9 +159,11 @@
         let maxReconnection = 20;
         const kodeTemp  = "{{ Session::get('kodeTemp') }}";
         const userId    = "{{ Session::get('userId') }}";
-        socket = new WebSocket("ws://192.168.68.72:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
+        socket = new WebSocket("ws://localhost:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
         socket.onopen = () => {
-             const stat = document.getElementById('statConnection');
+             const stat     = document.getElementById('statConnection');
+             const tx_stat  = document.getElementById('tx-stat');
+             tx_stat.innerHTML = '<p class="text-sm font-medium leading-tight">STATUS</p>';
              stat.innerHTML = '<p class="text-xs text-emerald-600 font-semibold">Online</p>';
              console.log("TERHUBUNG ✅");
         }
@@ -173,13 +175,15 @@
 
         socket.onclose = () => {
              const stat = document.getElementById('statConnection');
+             const tx_stat = document.getElementById('tx-stat');
+             tx_stat.innerHTML = '<p class="text-sm font-medium leading-tight">STATUS</p>';
              stat.innerHTML = '<p class="text-xs text-rose-600 font-semibold">Offline</p>';
              console.log("CLOSED ❌", reconnectCount);
              if(maxReconnection >= reconnectCount){
                     setTimeout(() =>{
                         reconnectCount++;
                         console.log(" Reconnect ke-" + reconnectCount + "...");
-                        const newSocket     = new WebSocket("ws://192.168.68.72:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
+                        const newSocket     = new WebSocket("ws://localhost:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
                         newSocket.onopen    = socket.onopen;
                         newSocket.onerror   = socket.onerror;
                         newSocket.onclose   = socket.onclose;
