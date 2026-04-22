@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
 class dashboardController extends Controller
 {
-    public function home(){
-        return view('home');
-    }
 
     public function dashboard(){
         $kode_temp = Session::get('kodeTemp');
@@ -518,6 +515,7 @@ class dashboardController extends Controller
                             'subtotal' => $value->subtotal,
                             'waktuPesan' => $value->tglTrans,
                             'statusPesanan' => $value->statPesanan,
+                            'note' => $value->keterangan,
                             'loadItem' => $gbTmp
                         ]);
                     }
@@ -607,6 +605,50 @@ class dashboardController extends Controller
 
                         return response()->json($arrData);
                     break;
+        }
+    }
+
+    public function actionKasir (Request $req){
+        $action = $req->input('action');
+        switch($action){
+            case 'getData':
+                 $search    = $req->input('search');
+                 $kodeTemp  = Session::get('kodeTemp');
+                 $query     = DB::table('tblPenjualan')
+                    ->leftJoin('tabel_meja', 'tblPenjualan.kodeMeja', '=', 'tabel_meja.kode_meja')
+                    ->select('tblPenjualan.*', 'tabel_meja.nomor_meja')
+                    ->where('tblPenjualan.kode_temp', $kodeTemp)->where('tblPenjualan.status', 'belum bayar');
+                 if(!empty($search)){
+                    $query = $query->where(function($whr) use ($search) {
+                        $whr->where('tblPenjualan.namaPelanggan', 'LIKE', "%{$search}%")
+                            ->orWhere('tblPenjualan.no_penjualan', 'LIKE', "%{$search}%")
+                            ->orWhere('tabel_meja.nomor_meja', 'LIKE', "%{$search}%");
+                        });
+                 }
+                 $count = $query->count();
+                 $arr = collect();
+                 $get = $query->get();
+                 foreach($get as $idx => $value){
+                    $gbItem = collect();
+                    $queryItem = DB::table('tmp_penjualan')->where('kode_temp',$value->kode_temp)->where('no_penjualan', $value->no_penjualan)->get();
+                    foreach($queryItem as $idxItem => $valItem){
+                        $gbItem->push([
+                            'namaItem' => $valItem->nama_item,
+                            'qty' => $valItem->qty
+                        ]);
+                    }
+                    $arr->push([
+                        'namaPelanggan' => $value->namaPelanggan,
+                        'meja'          => $value->nomor_meja,
+                        'nomorPenjualan'=> $value->no_penjualan,
+                        'total'         => $value->subtotal,
+                        'statPesanan'   => $value->statPesanan,
+                        'tgl_transaksi' => $value->tglTrans,
+                        'itemList'      => $gbItem
+                    ]);
+                 }
+                 return response()->json($arr);
+                break;
         }
     }
 }

@@ -1,3 +1,6 @@
+@if(!empty(Session::get('userId')) && !empty(Session::get('email')))
+<script>window.location.href="{{route('dashboard')}}";</script>
+@endif
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>

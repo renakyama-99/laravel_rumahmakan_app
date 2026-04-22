@@ -115,16 +115,43 @@
         </svg>
         <input type="text" id="searchMenu"  oninput="cariData()" placeholder="Cari menu..." class="bg-transparent border-none focus:outline-none w-full ml-3 text-sm">
       </div>
+            <!-- User Auth Profile -->
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-[11px] font-semibold text-slate-900 leading-none mb-1">{{Session::get('userId')}}</p>
+                </div>
+                
+                <div class="relative">
+                    <!-- Profile Button (Toggle logic required in Blade via Alpine.js or Vanilla JS) -->
+                    <button id="profileBtn" class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 border border-slate-300 hover:bg-slate-300 transition-all active:scale-95 cursor-pointer overflow-hidden">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jonathan" alt="User" class="w-full h-full">
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div id="profileDropdown" class="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-[60] hidden">
+                        <div class="px-4 py-2 border-b border-slate-100 mb-1">
+                            <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Account</p>
+                        </div>
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors group">
+                            <div class="text-slate-400 group-hover:text-indigo-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                            </div>
+                            Home
+                        </a>
+                        <div class="h-px bg-slate-100 mx-2 my-1"></div>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors text-left group">
+                                <div class="text-rose-400 group-hover:text-rose-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                </div>
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-      <div class="flex items-center gap-3">
-        <div class="text-right hidden sm:block">
-          <p class="text-[11px] font-bold text-slate-800 leading-none mb-1">Pelanggan Setia</p>
-          <p class="text-[10px] text-orange-500 font-bold leading-none">Gold Member</p>
-        </div>
-        <div class="w-10 h-10 rounded-full border-2 border-orange-100 p-0.5 overflow-hidden">
-          <img src="https://ui-avatars.com/api/?name=User&background=f97316&color=fff" class="rounded-full w-full h-full object-cover" alt="Avatar">
-        </div>
-      </div>
     </div>
   </nav>
 
@@ -260,6 +287,23 @@
  <script src="{{ asset('assets/js/sweetalert2.js') }}"></script>
  
   <script>
+            // Simple Profile Dropdown Toggle Logic
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', () => {
+            profileDropdown.classList.add('hidden');
+        });
+
+        profileDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
       const loadingStop = () => {
         document.querySelector('.loading-overlay').style.display='none';
       }
@@ -558,40 +602,41 @@ const renderCart = (json) => {
         const qty = cartItem ? cartItem.qty : 0;
 
         return `
-          <div class="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-100 flex flex-col group card-transition">
+          <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col group transition-all duration-200 hover:shadow-md">
             <div class="relative aspect-video overflow-hidden">
               <img src="{{asset('folderUser')}}/${item.locationFile}" class="w-full h-full object-cover group-hover:scale-105 duration-700" alt="${item.namaItem}">
-         
+              <div class="absolute top-4 left-4 bg-indigo-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-sm">
+                -${item.diskon} % Off
+              </div>
             </div>
             <div class="p-6 flex-grow flex flex-col">
-              <h3 class="font-bold text-lg text-slate-800 mb-2 group-hover:text-orange-500 transition-colors">${item.namaItem}</h3>
-              <p class="text-slate-500 text-xs sm:text-sm mb-6 leading-relaxed truncate-2">Diskon = ${item.diskon} %</p>
-              <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
-                <span class="text-orange-500 font-black text-xl">${formatRupiah(item.harga)}</span>
-                
-                <div class="flex items-center gap-3">
-                  <!-- Tombol Minus Bulat Tipis -->
-                  <button onclick="decrement('${item.kodeTem}','${item.kodeItem}',${item.harga},${item.diskon},'${item.namaItem}')" class="w-8 h-8 flex items-center justify-center border border-slate-400 rounded-full text-slate-500 hover:border-slate-500 hover:text-slate-600 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                  </button>
-                  
-                  <!-- Input Kuantitas Bergaya Minimalis (Selalu Tampil) -->
-                  <input type="number" id="#${item.kodeItem}"
-                         value="" 
-                         onchange="updateQtyFromInput(${item.kodeItem})"
-                         class="w-10 bg-transparent text-center text-lg font-bold text-orange-600 focus:outline-none border-none">
-                  
-                  <!-- Tombol Plus Bulat Biru Tipis -->
-                  <button onclick="increment('${item.kodeTem}','${item.kodeItem}',${item.harga},${item.diskon},'${item.namaItem}')" class="w-8 h-8 flex items-center justify-center border border-blue-500 rounded-full text-blue-500 hover:bg-blue-50 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                  </button>
-                </div>
-              </div>
+              <h3 class="font-bold text-lg text-slate-900 mb-1">${item.namaItem}</h3>
+                            <p class="text-slate-500 text-sm mb-6 leading-relaxed">
+                                Stok = ${item.stok}
+                            </p>
+                            <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                                <span class="text-slate-900 font-bold text-xl">${formatRupiah(item.harga)}</span>
+                                <!-- Tombol Minus Bulat Tipis -->
+                                <button onclick="decrement('${item.kodeTem}','${item.kodeItem}',${item.harga},${item.diskon},'${item.namaItem}')" class="w-10 h-10 bg-indigo-600 text-white rounded-lg flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-sm active:scale-95">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                  </svg>
+                                </button>
+                                
+                                <!-- Input Kuantitas Bergaya Minimalis (Selalu Tampil) -->
+                                <input type="number" id="#${item.kodeItem}"
+                                      value="" 
+                                      onchange="updateQtyFromInput(${item.kodeItem})"
+                                      class="w-10 bg-transparent text-center text-lg font-bold text-orange-600 focus:outline-none border-none">
+                                
+                                <!-- Tombol Plus Bulat Biru Tipis -->
+                                <button onclick="increment('${item.kodeTem}','${item.kodeItem}',${item.harga},${item.diskon},'${item.namaItem}')" class="w-10 h-10 bg-indigo-600 text-white rounded-lg flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-sm active:scale-95">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                  </svg>
+                                </button>
+                            </div>
             </div>
           </div>
         `;

@@ -24,7 +24,7 @@ Route::get('/', function () {
 
 
 
-route::get('/home',[dashboardController::class, 'home'])->middleware('authEmail');
+//route::get('/home',[dashboardController::class, 'home'])->name('home')->middleware('authEmail');
 
 
 //ROUTE UNTUK REGISTER
@@ -80,8 +80,10 @@ Route::get('pesanan', function(){
 })->name('pagePesanan')->middleware('authEmail');
 
 Route::post('/pesanan/actionPesanan',[dashboardController::class, 'act_pesanan'])->name('actionpesanan')->middleware('authEmail');
-Route::get('/dapur', function() { return view('pages.dapur');})->name('halDapur')->middleware('authEmail');
+//Route::get('/dapur', function() { return view('pages.dapur');})->name('halDapur')->middleware('authEmail');
 Route::post('/dapur/actionDapur',[dashboardController::class, 'actDapur'])->name('actionDapur')->middleware('authEmail');
 Route::get('/dapur/orderMonitor', function() {  return view('pages.dapurOrder'); })->name('dapur_order')->middleware('authEmail');
 Route::get('/dapur/orderDone', function() { return view('pages.dapurDone'); })->name('doneDapur')->middleware('authEmail');
-Route::get('/cashier', function() { return view('pages.cashier'); })->name('halKasir')->middleware('authEmail');
+//Route::get('/cashier', function() { return view('pages.cashier'); })->name('halKasir')->middleware('authEmail');
+Route::get('/cashierMonitor', function() {return view('pages.cashierMonitor'); })->name('monitorKasir')->middleware('authEmail');
+Route::post('/cashier/actionKasir', [dashboardController::class, 'actionKasir'])->name('actKasir')->middleware('authEmail');

@@ -1,5 +1,5 @@
 @if(Session::get('userId') == "" && Session::get('email') == "")
-<script>window.location.href="{{route('home')}}";</script>
+<script>window.location.href="{{route('dashboard')}}";</script>
 @endif
 @extends('pages.dapur')
 @section('head_content')
@@ -119,6 +119,9 @@
                                             <span class="text-sm text-slate-400">Rp ${itemOrder.harga.toLocaleString()}</span>
                                         </div>
                                     `).join('')}
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-sm font-medium text-slate-700">note : ${item.note}</span>
+                                    </div>
                                 </div>
 
                                 <div class="p-5 bg-slate-50 border-t border-slate-100 space-y-4">
@@ -161,10 +164,10 @@
         const userId    = "{{ Session::get('userId') }}";
         socket = new WebSocket("ws://localhost:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
         socket.onopen = () => {
-             const stat     = document.getElementById('statConnection');
-             const tx_stat  = document.getElementById('tx-stat');
-             tx_stat.innerHTML = '<p class="text-sm font-medium leading-tight">STATUS</p>';
-             stat.innerHTML = '<p class="text-xs text-emerald-600 font-semibold">Online</p>';
+             const stat             = document.getElementById('statConnection');
+             const tx_stat          = document.getElementById('tx-stat');
+             tx_stat.innerHTML      = '<p class="text-sm font-medium leading-tight">STATUS</p>';
+             stat.innerHTML         = '<p class="text-xs text-emerald-600 font-semibold">Online</p>';
              console.log("TERHUBUNG ✅");
         }
 
@@ -174,10 +177,10 @@
         };
 
         socket.onclose = () => {
-             const stat = document.getElementById('statConnection');
-             const tx_stat = document.getElementById('tx-stat');
-             tx_stat.innerHTML = '<p class="text-sm font-medium leading-tight">STATUS</p>';
-             stat.innerHTML = '<p class="text-xs text-rose-600 font-semibold">Offline</p>';
+             const stat         = document.getElementById('statConnection');
+             const tx_stat      = document.getElementById('tx-stat');
+             tx_stat.innerHTML  = '<p class="text-sm font-medium leading-tight">STATUS</p>';
+             stat.innerHTML     = '<p class="text-xs text-rose-600 font-semibold">Offline</p>';
              console.log("CLOSED ❌", reconnectCount);
              if(maxReconnection >= reconnectCount){
                     setTimeout(() =>{

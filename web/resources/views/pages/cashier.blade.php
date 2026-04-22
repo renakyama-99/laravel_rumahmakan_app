@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Cashier Order Monitor - Laravel Ready</title>
-    
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" />
 
     
     <!-- ALPINE.JS (Opsional, untuk logika Modal di HTML murni) -->
@@ -22,27 +23,11 @@
 
 
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased" x-data="{ 
-    search: '',
-    selectedOrder: null,
-    orders: [
-        { id: 'ORD-001', name: 'Ahmad Subarjo', table: 'Table 04', items: [{q:2, n:'Nasi Goreng'}, {q:2, n:'Es Teh'}], total: 90000, time: '12:45' },
-        { id: 'ORD-002', name: 'Siti Sarah', table: 'Takeaway', items: [{q:1, n:'Ayam Bakar'}, {q:1, n:'Jus Alpukat'}], total: 65000, time: '12:50' },
-        { id: 'ORD-003', name: 'Budi Hartono', table: 'Table 12', items: [{q:3, n:'Sate Ayam'}, {q:3, n:'Lontong'}, {q:1, n:'Es Jeruk'}], total: 105000, time: '12:55' },
-        { id: 'ORD-005', name: 'Keluarga Bpk. Anton', table: 'Table 20', items: [{q:2, n:'Ikan Gurame'}, {q:3, n:'Cah Kangkung'}, {q:2, n:'Nasi Bakul'}, {q:4, n:'Es Teller'}], total: 511000, time: '13:10' }
-    ],
-    get filteredOrders() {
-        if (this.search === '') return this.orders;
-        return this.orders.filter(i => i.name.toLowerCase().includes(this.search.toLowerCase()) || i.id.toLowerCase().includes(this.search.toLowerCase()));
-    },
-    formatIDR(val) {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
-    }
-}">
+<body class="bg-slate-50 text-slate-900 antialiased">
 
     <div class="min-h-screen flex flex-col">
         
-        <!-- 1. TOP NAVIGATION -->
+       <!-- 1. TOP NAVIGATION -->
         <nav class="sticky top-0 z-40 bg-white border-b border-slate-200">
             <div class="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
                 
@@ -52,21 +37,10 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18.06"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
                     </div>
                     <div class="hidden sm:block">
-                        <h1 class="text-lg font-black text-slate-800 tracking-tight leading-none uppercase">Monitor Pesanan</h1>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">Console Kasir v1.0</p>
+                        <h1 class="text-lg font-black text-slate-800 tracking-tight leading-none uppercase">HALAMAN KASIR</h1>
                     </div>
                 </div>
-
-                <!-- Search Bar -->
-                <div class="flex-1 max-w-xl relative">
-                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    <input 
-                        type="text" 
-                        x-model="search"
-                        placeholder="Cari Nama Pelanggan atau ID Pesanan..." 
-                        class="w-full pl-12 pr-4 py-3 bg-slate-100 border-transparent rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none"
-                    >
-                </div>
+                @yield('searchBar')
 
                 <!-- Time & User (Static for Laravel) -->
                 <div class="flex items-center space-x-6">
@@ -74,8 +48,35 @@
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Jam Server</span>
                         <span class="text-sm font-mono font-black text-slate-700">12:57:49</span>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    
+                    <!-- User Dropdown -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200 hover:text-indigo-600 hover:border-indigo-200 transition-all focus:outline-none">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </button>
+
+                        <div 
+                            x-show="open" 
+                            x-cloak
+                            @click.away="open = false"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-95"
+                            class="absolute right-0 mt-3 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 overflow-hidden"
+                        >
+                            <a href="{{route('dashboard')}}" class="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                <span>Home</span>
+                            </a>
+                            <div class="h-px bg-slate-100 mx-2"></div>
+                            <a href="{{ route('logout') }}" class="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-rose-500 hover:bg-rose-50 transition-colors">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                                <span>Logout</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -83,118 +84,7 @@
 
         <!-- 2. MAIN CONTENT -->
         <main class="max-w-[1600px] mx-auto px-6 py-8 flex-1 w-full">
-            
-            <!-- Summary Bar -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Total Antrean</p>
-                        <h3 class="text-2xl font-black text-slate-800 leading-none" x-text="orders.length + ' Pesanan'"></h3>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Sudah Dibayar</p>
-                        <h3 class="text-2xl font-black text-slate-800 leading-none">42 Selesai</h3>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Avg. Processing</p>
-                        <h3 class="text-2xl font-black text-slate-800 leading-none">~12 Menit</h3>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Table Container -->
-            <div class="bg-white rounded-[32px] border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden">
-                <div class="p-8 border-b border-slate-100 flex justify-between items-center flex-wrap gap-4">
-                    <div>
-                        <h2 class="text-xl font-black text-slate-800 tracking-tight leading-none mb-1 uppercase text-left">Daftar Antrean Kasir</h2>
-                        <p class="text-xs text-slate-400 font-medium text-left">Klik tombol bayar untuk memproses transaksi pelanggan.</p>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <button class="px-4 py-2 text-xs font-bold text-slate-500 bg-slate-50 rounded-xl hover:bg-slate-100 border border-slate-200 uppercase tracking-widest">Laporan</button>
-                        <button class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 uppercase tracking-widest">Refresh</button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto text-left">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                <th class="py-5 pl-8">Pelanggan</th>
-                                <th class="py-5 px-4">Meja</th>
-                                <th class="py-5 px-4 hidden sm:table-cell">Waktu</th>
-                                <th class="py-5 px-4 hidden lg:table-cell">Detail Pesanan</th>
-                                <th class="py-5 px-4">Tagihan</th>
-                                <th class="py-5 pr-8 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-50">
-                            <template x-for="order in filteredOrders" :key="order.id">
-                                <tr class="group hover:bg-slate-50/50 transition-colors">
-                                    <td class="py-5 pl-8 text-left">
-                                        <div>
-                                            <p class="text-sm font-black text-slate-800 uppercase tracking-tight" x-text="order.name"></p>
-                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" x-text="order.id"></p>
-                                        </div>
-                                    </td>
-                                    <td class="py-5 px-4">
-                                        <div :class="order.table === 'Takeaway' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-indigo-50 text-indigo-600 border-indigo-100'" class="inline-flex items-center px-3 py-1.5 rounded-xl border font-bold text-xs tracking-tighter">
-                                            <template x-if="order.table === 'Takeaway'">
-                                                <div class="flex items-center">
-                                                    <svg class="mr-1.5" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                                                    <span>TAKEAWAY</span>
-                                                </div>
-                                            </template>
-                                            <template x-if="order.table !== 'Takeaway'">
-                                                <div class="flex items-center">
-                                                    <span class="mr-1.5 text-[10px] opacity-60">TABLE</span>
-                                                    <span x-text="order.table.split(' ')[1]"></span>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </td>
-                                    <td class="py-5 px-4 hidden sm:table-cell text-left">
-                                        <div class="flex items-center text-xs font-bold text-slate-500 bg-slate-100/50 w-fit px-2 py-1 rounded-md">
-                                            <svg class="mr-1.5" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                            <span x-text="order.time"></span>
-                                        </div>
-                                    </td>
-                                    <td class="py-5 px-4 hidden lg:table-cell text-left">
-                                        <div class="max-h-24 overflow-y-auto custom-scrollbar pr-2 space-y-1.5 max-w-[280px]">
-                                            <template x-for="(item, idx) in order.items" :key="idx">
-                                                <div class="flex justify-between items-center text-[10px] bg-white border border-slate-100 px-2.5 py-1 rounded-lg text-slate-600 shadow-sm border-l-2 border-l-indigo-200">
-                                                    <span class="truncate mr-2"><span class="font-black text-indigo-600" x-text="item.q + 'x'"></span> <span x-text="item.n"></span></span>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </td>
-                                    <td class="py-5 px-4 text-left">
-                                        <p class="text-sm font-black text-slate-800 tracking-tight" x-text="formatIDR(order.total)"></p>
-                                    </td>
-                                    <td class="py-5 pr-8 text-right">
-                                        <button @click="selectedOrder = order" class="inline-flex items-center px-6 py-2.5 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 group/btn">
-                                            <span>Bayar</span>
-                                            <svg class="ml-2 group-hover:translate-x-1 transition-transform" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            @yield('content')
         </main>
 
         <!-- 3. PAYMENT MODAL -->
@@ -243,6 +133,6 @@
         </div>
 
     </div>
-
+@yield('script')
 </body>
 </html>

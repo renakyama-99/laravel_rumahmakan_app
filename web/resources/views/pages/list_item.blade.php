@@ -1,5 +1,5 @@
 @if(Session::get('level') != "admin")
-<script>window.location.href="{{route('home')}}";</script>
+<script>window.location.href="{{route('dashboard')}}";</script>
 @endif
 @extends('home')
 @section('header' , 'List Item / Menu')

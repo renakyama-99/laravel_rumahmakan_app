@@ -167,6 +167,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('dapur_order') }}">Dapur Monitoring</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('monitorKasir') }}">Kasir</a>
+                    </li>                    
                 </ul>
             </div>
       </li>

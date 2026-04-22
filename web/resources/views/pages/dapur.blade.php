@@ -63,6 +63,7 @@
                             <i class="fa-solid fa-bell text-slate-600"></i>
                             <span class="absolute top-1.5 right-1.5 size-2 bg-rose-500 rounded-full border-2 border-white"></span>
                         </button>
+                        
                         <div class="h-8 w-px bg-slate-200 mx-2 hidden sm:block"></div>
                         <div class="hidden sm:block text-right">
                             <div id="tx-stat">
@@ -78,7 +79,7 @@
                 <!-- Tabs Filter (Unified row for all devices) -->
                 <div class="border-t border-slate-100 px-4 lg:px-8 py-2 bg-slate-50/50">
                     <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-                        <button @click="activeTab = 'all'" :class="activeTab === 'all' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Semua</button>
+                        <a href="{{route('dashboard')}}" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Home</a>
                         <button @click="activeTab = 'pending'" :class="activeTab === 'pending' ? 'bg-amber-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Menunggu</button>
                         <button @click="activeTab = 'preparing'" :class="activeTab === 'preparing' ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Dimasak</button>
                         <button @click="activeTab = 'ready'" :class="activeTab === 'ready' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Siap Saji</button>
