@@ -87,3 +87,5 @@ Route::get('/dapur/orderDone', function() { return view('pages.dapurDone'); })->
 //Route::get('/cashier', function() { return view('pages.cashier'); })->name('halKasir')->middleware('authEmail');
 Route::get('/cashierMonitor', function() {return view('pages.cashierMonitor'); })->name('monitorKasir')->middleware('authEmail');
 Route::post('/cashier/actionKasir', [dashboardController::class, 'actionKasir'])->name('actKasir')->middleware('authEmail');
+
+Route::get('/cashierMonitor/bayar/{id}', [dashboardController::class, 'transaksiBayar'])->name('actBayar')->middleware('authEmail');

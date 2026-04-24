@@ -45,8 +45,8 @@
                 <!-- Time & User (Static for Laravel) -->
                 <div class="flex items-center space-x-6">
                     <div class="hidden md:flex flex-col items-end">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Jam Server</span>
-                        <span class="text-sm font-mono font-black text-slate-700">12:57:49</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right" id="tx_stat"></span>
+                        <span class="text-sm font-mono font-black text-slate-700" id="statConnection"></span>
                     </div>
                     
                     <!-- User Dropdown -->

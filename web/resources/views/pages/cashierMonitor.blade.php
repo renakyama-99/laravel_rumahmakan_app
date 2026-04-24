@@ -66,94 +66,16 @@
                             <tr class="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                                 <th class="py-5 pl-8">Pelanggan</th>
                                 <th class="py-5 px-4">Meja</th>
+                                <th class="py-5 px-4">Masakr</th>
+                                <th class="py-5 px-4">Bayar</th>
                                 <th class="py-5 px-4 hidden sm:table-cell">Waktu</th>
                                 <th class="py-5 px-4 hidden lg:table-cell">Detail Pesanan</th>
                                 <th class="py-5 px-4">Tagihan</th>
                                 <th class="py-5 pr-8 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-50">
-                            
-                            <tr class="group hover:bg-slate-50/50 transition-colors">
-                                <td class="py-5 pl-8">
-                                    <div>
-                                        <p class="text-sm font-black text-slate-800 uppercase tracking-tight">Ahmad Subarjo</p>
-                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ORD-001</p>
-                                    </div>
-                                </td>
-                                <td class="py-5 px-4">
-                                    <div class="inline-flex items-center px-3 py-1.5 rounded-xl border font-bold text-xs bg-indigo-50 text-indigo-600 border-indigo-100">
-                                        <span class="mr-1.5 text-[10px] opacity-60 uppercase">Table</span>
-                                        <span>04</span>
-                                    </div>
-                                </td>
-                                <td class="py-5 px-4 hidden sm:table-cell">
-                                    <div class="flex items-center text-xs font-bold text-slate-500 bg-slate-100/50 w-fit px-2 py-1 rounded-md">
-                                        <svg class="mr-1.5" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                        <span>12:45</span>
-                                    </div>
-                                </td>
-                                <td class="py-5 px-4 hidden lg:table-cell text-left">
-                                    <div class="max-h-24 overflow-y-auto custom-scrollbar pr-2 space-y-1.5 max-w-[280px]">
-                                       
-                                        <div class="flex justify-between items-center text-[10px] bg-white border border-slate-100 px-2.5 py-1 rounded-lg text-slate-600 shadow-sm border-l-2 border-l-indigo-200">
-                                            <span class="truncate mr-2"><span class="font-black text-indigo-600">2x</span> Nasi Goreng Spesial</span>
-                                        </div>
-                                        <div class="flex justify-between items-center text-[10px] bg-white border border-slate-100 px-2.5 py-1 rounded-lg text-slate-600 shadow-sm border-l-2 border-l-indigo-200">
-                                            <span class="truncate mr-2"><span class="font-black text-indigo-600">2x</span> Es Teh Manis</span>
-                                        </div>
-                                       
-                                    </div>
-                                </td>
-                                <td class="py-5 px-4">
-                                    <p class="text-sm font-black text-slate-800 tracking-tight">Rp 90.000</p>
-                                </td>
-                                <td class="py-5 pr-8 text-right">
-                                    <button class="pay-btn inline-flex items-center px-6 py-2.5 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 group/btn" data-id="ORD-001" data-name="Ahmad Subarjo" data-total="Rp 90.000">
-                                        <span>Bayar</span>
-                                        <svg class="ml-2 group-hover:translate-x-1 transition-transform" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                                    </button>
-                                </td>
-                            </tr>
-                            <!-- LARAVEL END: -->
-
-                            <!-- Mock Row 2 -->
-                            <tr class="group hover:bg-slate-50/50 transition-colors">
-                                <td class="py-5 pl-8">
-                                    <div>
-                                        <p class="text-sm font-black text-slate-800 uppercase tracking-tight">Siti Sarah</p>
-                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ORD-002</p>
-                                    </div>
-                                </td>
-                                <td class="py-5 px-4">
-                                    <div class="inline-flex items-center px-3 py-1.5 rounded-xl border font-bold text-xs bg-amber-50 text-amber-600 border-amber-100">
-                                        <svg class="mr-1.5" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                                        <span>TAKEAWAY</span>
-                                    </div>
-                                </td>
-                                <td class="py-5 px-4 hidden sm:table-cell">
-                                    <div class="flex items-center text-xs font-bold text-slate-500 bg-slate-100/50 w-fit px-2 py-1 rounded-md">
-                                        <svg class="mr-1.5" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                        <span>12:50</span>
-                                    </div>
-                                </td>
-                                <td class="py-5 px-4 hidden lg:table-cell text-left">
-                                    <div class="max-h-24 overflow-y-auto custom-scrollbar pr-2 space-y-1.5 max-w-[280px]">
-                                        <div class="flex justify-between items-center text-[10px] bg-white border border-slate-100 px-2.5 py-1 rounded-lg text-slate-600 shadow-sm border-l-2 border-l-indigo-200">
-                                            <span class="truncate mr-2"><span class="font-black text-indigo-600">1x</span> Ayam Bakar Madu</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-5 px-4">
-                                    <p class="text-sm font-black text-slate-800 tracking-tight">Rp 65.000</p>
-                                </td>
-                                <td class="py-5 pr-8 text-right">
-                                    <button class="pay-btn inline-flex items-center px-6 py-2.5 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 group/btn" data-id="ORD-002" data-name="Siti Sarah" data-total="Rp 65.000">
-                                        <span>Bayar</span>
-                                        <svg class="ml-2 group-hover:translate-x-1 transition-transform" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                                    </button>
-                                </td>
-                            </tr>
+                        <tbody class="divide-y divide-slate-50" id="tableBody">
+                          
                         </tbody>
                     </table>
                 </div>
@@ -197,12 +119,95 @@ const getData = () => {
     })
 }
 
+const renderData = () => {
+    const tblBody = document.getElementById('tableBody');
+    if(dataPesanan.length < 1){
+        tblBody.innerHTML = `<tr class="group hover:bg-slate-50/50 transition-colors">
+                                <td colspan="8" class="p-0">
+                                    <div class="flex items-center justify-center min-h-[200px]">
+                                        <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 text-center">
+                                            <i class="fa-solid fa-utensils text-4xl text-slate-200 mb-4 block mx-auto"></i>
+                                            <p class="text-slate-500 font-medium">Tidak ada pesanan ditemukan</p>
+                                        </div>
+                                    </div>
+                                </td>               
+                             </tr>`;
+    }else{
+        tblBody.innerHTML = dataPesanan.map(item => {
+            return `
+                <tr class="group hover:bg-slate-50/50 transition-colors">
+                     <td class="py-5 pl-8">
+                        <div>
+                            <p class="text-sm font-black text-slate-800 uppercase tracking-tight">${item.namaPelanggan}</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${item.nomorPenjualan}</p>      
+                        </div>
+                     </td>
+                     <td class="py-5 px-4">
+                        <div class="inline-flex items-center px-3 py-1.5 rounded-xl border font-bold text-xs bg-indigo-50 text-indigo-600 border-indigo-100">
+                            <span class="mr-1.5 text-[10px] opacity-60 uppercase">${item.meja}</span>
+                        </div>
+                     </td>
+                     <td class="py-5 px-4 text-left">
+                        ${item.statPesanan === "sudah dimasak" ? 
+                        `<div class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100">
+                            <svg class="mr-1.5" width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                        ${item.statPesanan}
+                        </div>` 
+                        : 
+                        ` <div class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-50 text-amber-600 border border-amber-100">
+                            <div class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-2 animate-pulse"></div>
+                             ${item.statPesanan}
+                         </div>`
+                        }
+                     </td class="py-5 px-4 text-left">
+                     <td>
+                        ${item.statBayar === "sudah bayar" ?
+                        `<div class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-600 border border-indigo-100">
+                            ${item.statBayar}
+                        </div>` :
+                        `<div class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-100">
+                            ${item.statBayar}
+                        </div>`
+                    }
+                     </td>
+                     <td class="py-5 px-4 hidden sm:table-cell">
+                        <div class="flex items-center text-xs font-bold text-slate-500 bg-slate-100/50 w-fit px-2 py-1 rounded-md">
+                            <svg class="mr-1.5" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span>${item.tgl_transaksi}</span>
+                        </div>
+                     </td>
+                     <td class="py-5 px-4 lg:table-cell text-left">
+                        <div class="max-h-24 overflow-y-auto custom-scrollbar pr-2 space-y-1.5 max-w-[280px]">
+                                ${item.itemList.map(menu => {
+                                    return `
+                                     <div class="flex justify-between items-center text-[10px] bg-white border border-slate-100 px-2.5 py-1 rounded-lg text-slate-600 shadow-sm border-l-2 border-l-indigo-200">
+                                        <span class="truncate mr-2"><span class="font-black text-indigo-600">${menu.qty}x</span>${menu.namaItem}</span>
+                                     </div>
+                                    `
+                                }).join('')}
+                        </div>
+                     </td>
+                     <td class="py-5 px-4">
+                        <p class="text-sm font-black text-slate-800 tracking-tight">${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(item.total)}</p>
+                     </td>
+                     <td>
+                        <a href="cashierMonitor/bayar/${item.nomorPenjualan}" class="pay-btn inline-flex items-center px-6 py-2.5 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 group/btn">
+                                <span>Bayar</span>
+                                <svg class="ml-2 group-hover:translate-x-1 transition-transform" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </a>
+                     </td>
+                </tr>
+            `;
+        }).join('');
+    }
+}
 const cariData = () => {
     run();
 }
 const run = async() =>{
     try{
         get = await  getData();
+        renderData();
     }catch(e){
         console.log(`Error function ${e}`);
     }
@@ -211,5 +216,21 @@ const run = async() =>{
 
 run();
 
+        let socket;
+        let reconnectCount = 0;
+        let maxReconnection = 20;
+        const kodeTemp  = encodeURIComponent("{{ Session::get('kodeTemp') }}");
+        const userId    = encodeURIComponent("{{ Session::get('userId') }}");
+        const tokenSend = encodeURIComponent(token);
+        socket = new WebSocket("ws://localhost:10000/kasir?kodeTemp="+kodeTemp+"&userId="+userId+"token="+tokenSend);
+
+        socket.onopen = () => {
+             const stat         = document.getElementById('statConnection');
+             const tx_stat      = document.getElementById('tx_stat');
+             tx_stat.innerHTML      = '<p class="text-sm font-medium leading-tight">STATUS</p>';
+             stat.innerHTML         = '<p class="text-xs text-emerald-600 font-semibold">Online</p>';
+             console.log("TERHUBUNG ✅");
+        }
+        
 </script>
 @endsection

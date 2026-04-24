@@ -15,7 +15,8 @@ con.connect(function(err) {
   });
   
 
-  let CLIENTS       = [];
+ // let CLIENTS       = [];
+  let groups        = {};
 function kirimKeSemua(msg) {
     for(let i = 0; i < CLIENTS.length; i++){
         if(CLIENTS[i]?.readyState === 1) {
@@ -48,10 +49,15 @@ function validasiToken(token, callback){
         }
       });
     
-      CLIENTS.push(ws);
-      console.log("Client masuk:", userId);
-      console.log("Total client:", CLIENTS.length);
-    
+      if(!groups[kodeTemp]){
+        groups[kodeTemp] = [];
+      }
+
+      groups[kodeTemp].push(ws);
+      //CLIENTS.push(ws);
+      
+     // console.log("Client masuk:", userId);
+  
       ws.on('message', function incoming_data(data){
           let msg   = JSON.parse(data);
           const act = msg.action;
@@ -66,14 +72,18 @@ function validasiToken(token, callback){
       });
 
       ws.on('close', function() {
-        const index = CLIENTS.indexOf(ws);
+        const index = groups[kodeTemp].indexOf(ws);
         if(index > -1){
-          CLIENTS.splice(index, 1);
-          console.log("Client keluar:", userId, "| Total:", CLIENTS.length);
+          groups[kodeTemp].splice(index, 1);
+          console.log("Client keluar:", userId, "| Total:",  groups[kodeTemp].length);
         }
       });
 
-      
+     //const result = {};
+     //for(const kode in groups){
+     // result[kode] = groups[kode].map(ws => ws.userId);
+    // }
+    // console.log(JSON.stringify(result, null, 2));
   })
 
  function queryPromise(sql, params = []){
@@ -128,8 +138,8 @@ function validasiToken(token, callback){
          const inserTblPejualan = await queryPromise(query_single_input,[kodeTempat,code,pelanggan,msg.user,msg.meja,insertSubtotal,msg.catatan,"belum bayar","belum dimasak",dateTime]);                           
          const multiInsert      = await queryPromise(multipleInput,[valuesTmp_penjualan]);
          const deleteTmpPesanan = await queryPromise("DELETE FROM tmp_pesanan WHERE kode_temp = ? AND user = ? AND kode_meja = ?",[kodeTempat,msg.user,msg.meja]);
-          console.log(msg.meja);
-        CLIENTS.forEach((item,index) => {
+         console.log(msg.meja);
+        groups[kodeTempat].forEach((item,index) => {
             if(item.kodeTemp == kodeTempat && item.userId == msg.user && item.path == ws.path){
                 item.send('berhasil');
             }else if(item.kodeTemp == kodeTempat && item.path == "/dapur"){
@@ -150,7 +160,7 @@ function validasiToken(token, callback){
    const query        = `UPDATE tblPenjualan set statPesanan='sudah dimasak' WHERE kode_temp=? AND no_penjualan=? `;
    const update       = await queryPromise(query, [kodeTempat, noPenjualan]);
    console.log('update');
-   CLIENTS.forEach((item,index) => {
+   groups[kodeTempat].forEach((item,index) => {
     if(item.kodeTemp == kodeTempat && item.userId == user && item.path == ws.path){
       item.send('update sukses');
     }

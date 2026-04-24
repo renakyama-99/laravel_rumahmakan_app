@@ -643,6 +643,7 @@ class dashboardController extends Controller
                         'nomorPenjualan'=> $value->no_penjualan,
                         'total'         => $value->subtotal,
                         'statPesanan'   => $value->statPesanan,
+                        'statBayar'     => $value->status,
                         'tgl_transaksi' => $value->tglTrans,
                         'itemList'      => $gbItem
                     ]);
@@ -650,6 +651,11 @@ class dashboardController extends Controller
                  return response()->json($arr);
                 break;
         }
+    }
+
+    public function transaksiBayar($noPenjualan){
+                return view('pages.cashier');
+                
     }
 }
 
