@@ -110,7 +110,8 @@ class dashboardController extends Controller
                                                     'nama_file' => $new_file_name,
                                                     'stok'      => $stock,
                                                     'harga'     => $harga_jual,
-                                                    'diskon'    => $diskon
+                                                    'diskon'    => $diskon,
+                                                    'type'      => $type
                                                     );
                               $insert       = DB::table('tabel_item')->insert($array_insert);
                               $moved        = $file_upload->move($path_upload,$new_file_name);
@@ -244,8 +245,8 @@ class dashboardController extends Controller
         switch($action){
             case 'loadData' :
                 $kode_temp      = Session::get('kodeTemp');
-                $cari           = $req->input('cari');
-                $query          = DB::table('tabel_item')->where('kode_temp', $kode_temp);
+                $cari = trim($req->input('cari') ?? '');
+                $query          = DB::table('tabel_item')->where('kode_temp', $kode_temp)->where('type', '!=', 'tambahan');
                 if(!empty($cari)){
                     $query->where('nama_item', 'LIKE', '%' . $cari . '%');
                 }
@@ -264,7 +265,8 @@ class dashboardController extends Controller
                              "locationFile" => $kode_temp."/".$value->nama_file,
                              "stok" => $value->stok,
                              "harga" => $value->harga,
-                             "diskon" => $value->diskon
+                             "diskon" => $value->diskon,
+                             "type" => $value->type
                             );
                     }
                     
@@ -311,6 +313,7 @@ class dashboardController extends Controller
                     $diskon      = $req->input('disc');
                     $kodeMeja    = $req->input('meja');
                     $nama_item   = $req->input('nama_item');
+                    $type        = $req->input('type');
                     $user        = Session::get('userId');
                     $cek         = DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
                                                            ->where('user',$user)
@@ -328,7 +331,8 @@ class dashboardController extends Controller
                             'harga_jual'=> $hargaJual,
                             'diskon'    => $diskon,
                             'qty'       => 1,
-                            'total'     => 1 * $hargaJual
+                            'total'     => 1 * $hargaJual,
+                            'type'      => $type
                         );
                         $insert    = DB::table('tmp_pesanan')->insert($arrInsert);
                         $arrData   = array(
@@ -367,11 +371,14 @@ class dashboardController extends Controller
                     $diskon      = $req->input('disc');
                     $kodeMeja    = $req->input('meja');
                     $nama_item   = $req->input('nama_item');
+                    $type        = $req->input('type');
                     $user        = Session::get('userId');
                     $cek         = DB::table('tmp_pesanan')->where('kode_temp', $kode_tempat)
                                                            ->where('user',$user)
                                                            ->where('kode_meja',$kodeMeja)
-                                                           ->where('kode_item', $kode_item)->count();
+                                                           ->where('kode_item', $kode_item)
+                                                           ->where('type', $type)
+                                                           ->count();
                     if($cek > 0){
                         $potongan   = ($harga * $diskon) / 100;
                         $hargaJual  = $harga - $potongan;
@@ -650,12 +657,150 @@ class dashboardController extends Controller
                  }
                  return response()->json($arr);
                 break;
+
+                case 'getDataBayar' :
+                    $kodeTemp       = Session::get('kodeTemp');
+                    $noPenjualan    = $req->input('kodeJual');
+                    $query          = DB::table('tmp_penjualan')->where('kode_temp',$kodeTemp)->where('no_penjualan',$noPenjualan);
+                    $count          = $query->count();
+                    $arr            = collect();
+                    if($count > 0){
+                        $get = $query->get();
+                        foreach($get as $index => $val){
+                            $arr->push([
+                                'qty' => $val->qty,
+                                'namaItem' => $val->nama_item,
+                                'hargaJual' => $val->harga_jual,
+                                'total' => $val->total
+                            ]);
+                        }
+                    }
+                    return response()->json($arr);
+                break;
+
+                case 'getItemTambahan' :
+                        $kodeTemp  = Session::get('kodeTemp');
+                        $query     = DB::table('tabel_item')->where('kode_temp',$kodeTemp)->where('type', "tambahan");
+                        $getData   = $query->get();
+                        $arr       = collect();
+                        if($query->count() > 0){
+                            foreach($getData as $index => $value){
+                                $arr->push([
+                                    'kodeTemp' => $value->kode_temp,
+                                    'kodeItem' => $value->kode_item,
+                                    'namaItem' => $value->nama_item,
+                                    'hargaJual' => $value->harga,
+                                    'diskon'    => $value->diskon,
+                                    'stok' => $value->stok,
+                                    'type' => $value->type,
+                                    'locationFile' => $kodeTemp."/".$value->nama_file
+                                ]);
+                            }
+                        }
+                        echo json_encode($arr);
+                    break;
+
+                case 'tambahItem' :
+                        $codeTemp   = $req->input('ktemp');
+                        $codeItem   = $req->input('kItem');
+                        $namaItem   = $req->input('namaItem');
+                        $nomorJual  = $req->input('noJual');
+                        $codeMeja   = $req->input('kMeja');
+                        $user       = $req->input('user');
+                        $hargaJual  = $req->input('hJual');
+                        $diskon     = $req->input('diskon');
+                        $type       = $req->input('type');
+                        $query      = DB::table('tmp_penjualan')->where('kode_temp', $codeTemp)->where('no_penjualan', $nomorJual)
+                                                                ->where('kode_meja', $codeMeja)->where('kode_item',$codeItem);
+                        $count      = $query->count();
+                        if($count < 1){
+                                $potongan = ($hargaJual * $diskon)/100;
+                                $hargaReal = $hargaJual - $potongan;
+                                $arrInsert = array(
+                                    'kode_temp' => $codeTemp,
+                                    'no_penjualan' => $nomorJual,
+                                    'user' => $user,
+                                    'kode_meja' => $codeMeja,
+                                    'kode_item' => $codeItem,
+                                    'nama_item' => $namaItem,
+                                    'harga_jual' => $hargaJual,
+                                    'diskon'     => $diskon ,
+                                    'qty' => 1,
+                                    'total' => 1 * $hargaReal,
+                                    'type' => $type
+                                );
+                                $insert = DB::table('tmp_penjualan')->insert($arrInsert);
+                                $updateStock = DB::table('tabel_item')->where('kode_temp',$codeTemp)->where('kode_item',$codeItem)->update(['stok' => DB::raw('stok - 1')]);
+                                $arrData = array(
+                                    'msg' => "insert data",
+                                    'qty' => 1
+                                );
+                        }elseif($count > 0){
+                                $potongan = ($hargaJual * $diskon)/100;
+                                $hargaReal = $hargaJual - $potongan;
+                                $getQty    =  $query->value('qty');
+
+                                $qtyUpdate = $getQty + 1;
+                                $totalReal = $qtyUpdate * $hargaReal;
+
+                                $arrUpdate = array(
+                                    'qty' => $qtyUpdate,
+                                    'total' => $totalReal
+                                );
+                                $query->update($arrUpdate);
+                                $updateStock = DB::table('tabel_item')->where('kode_temp',$codeTemp)->where('kode_item',$codeItem)->update(['stok' => DB::raw('stok - 1')]);
+                                $arrData = array(
+                                    'msg' => "update data",
+                                    'qty' =>  $qtyUpdate
+                                );
+                        }       
+                        echo json_encode($arrData);                              
+                    break;
+
+                    case 'catalogTambahan' :
+                        $noPenjualan = $req->input('noPenjualan');
+                        $codeTemp    = Session::get('kodeTemp');
+                        $query       = DB::table('tmp_penjualan')->where('kode_temp',$codeTemp)->where('no_penjualan',$noPenjualan);
+                        $arr         = collect();
+                        if($query->count() > 0){
+                         $get         = $query->get();
+                        foreach($get as $index => $value){
+                            $namaFile = DB::table('tabel_item')->where('kode_temp',$codeTemp)->where('kode_item', $value->kode_item)->value('nama_file');
+                            $arr->push([
+                                'kodeTemp' => $value->kode_temp,
+                                'kdPenjualan' => $value->no_penjualan,
+                                'kodeItem'  => $value->kode_item,
+                                'namaItem' => $value->nama_item,
+                                'qty' => $value->qty,
+                                'hargaJual' => $value->harga_jual,
+                                'diskon' => $value->diskon,
+                                'user' => $value->user,
+                                'locationFile' => $codeTemp."/".$namaFile
+                            ]);
+                        }
+                        }
+                        echo json_encode($arr);
+                        break;
+
         }
     }
 
     public function transaksiBayar($noPenjualan){
-                return view('pages.cashier');
+        $kodeTemp = Session::get('kodeTemp');
+        $query    = DB::table('tblPenjualan')->where('kode_temp', $kodeTemp)->where('no_penjualan',$noPenjualan);
+        $count    = $query->count();
+        if($count < 1){
+                echo "Error! no Data";
+        }elseif($count > 0){
+                $data = $query->select('kodeMeja','user_id')->first();
+                if($data){
+                    $kodeMeja = $data->kodeMeja;
+                    $user     = $data->user_id;
+                    return view('pages/bayar', ['noPenjualan' => $noPenjualan, 'kodeMeja'=>$kodeMeja, 'user' => $user ]);
+                }
                 
+        }
     }
+
 }
 

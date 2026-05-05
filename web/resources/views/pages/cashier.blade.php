@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Cashier Order Monitor - Laravel Ready</title>
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" />
-
+    <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.css') }}">
     
     <!-- ALPINE.JS (Opsional, untuk logika Modal di HTML murni) -->
 
@@ -83,55 +83,9 @@
         </nav>
 
         <!-- 2. MAIN CONTENT -->
-        <main class="max-w-[1600px] mx-auto px-6 py-8 flex-1 w-full">
+        
             @yield('content')
-        </main>
-
-        <!-- 3. PAYMENT MODAL -->
-        <div x-show="selectedOrder" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-transition.opacity>
-            <div @click.away="selectedOrder = null" class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-y-4 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100">
-                <div class="p-6 border-b border-slate-100 flex justify-between items-center text-left">
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-800 uppercase tracking-tight">Konfirmasi Bayar</h3>
-                        <p class="text-sm text-slate-500" x-text="selectedOrder?.id + ' • ' + selectedOrder?.name"></p>
-                    </div>
-                    <button @click="selectedOrder = null" class="p-2 hover:bg-slate-100 rounded-full text-slate-400">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    </button>
-                </div>
-
-                <div class="p-6 space-y-6 text-left">
-                    <div class="bg-slate-50 p-6 rounded-2xl flex flex-col items-center justify-center border border-slate-100 italic">
-                        <span class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1 font-sans not-italic">Total Tagihan</span>
-                        <span class="text-4xl font-black text-indigo-600" x-text="formatIDR(selectedOrder?.total || 0)"></span>
-                    </div>
-
-                    <div class="space-y-3">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-widest">Metode Pembayaran</label>
-                        <div class="grid grid-cols-3 gap-3">
-                            <button class="flex flex-col items-center justify-center p-4 rounded-2xl border bg-emerald-50 border-emerald-100 text-emerald-600 ring-2 ring-indigo-500 ring-offset-2">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" class="mb-2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                                <span class="text-[10px] font-bold uppercase">Tunai</span>
-                            </button>
-                            <button class="flex flex-col items-center justify-center p-4 rounded-2xl border bg-white border-slate-200 text-slate-400">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" class="mb-2"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
-                                <span class="text-[10px] font-bold uppercase">Debit</span>
-                            </button>
-                            <button class="flex flex-col items-center justify-center p-4 rounded-2xl border bg-white border-slate-200 text-slate-400">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" class="mb-2"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18.06"/></svg>
-                                <span class="text-[10px] font-bold uppercase">QRIS</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-6 bg-slate-50 flex gap-4">
-                    <button @click="selectedOrder = null" class="flex-1 py-4 text-sm font-bold text-slate-400 uppercase tracking-widest">Batal</button>
-                    <button @click="selectedOrder = null" class="flex-[2] bg-indigo-600 text-white rounded-2xl py-4 text-sm font-bold shadow-lg shadow-indigo-100 uppercase tracking-widest">Konfirmasi & Cetak</button>
-                </div>
-            </div>
-        </div>
-
+       
     </div>
 @yield('script')
 </body>

@@ -16,6 +16,7 @@
     </div>
 @endsection
 @section('content')
+<main class="max-w-[1600px] mx-auto px-6 py-8 flex-1 w-full">
           <!-- Summary Bar -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-center space-x-4">
@@ -67,7 +68,6 @@
                                 <th class="py-5 pl-8">Pelanggan</th>
                                 <th class="py-5 px-4">Meja</th>
                                 <th class="py-5 px-4">Masakr</th>
-                                <th class="py-5 px-4">Bayar</th>
                                 <th class="py-5 px-4 hidden sm:table-cell">Waktu</th>
                                 <th class="py-5 px-4 hidden lg:table-cell">Detail Pesanan</th>
                                 <th class="py-5 px-4">Tagihan</th>
@@ -80,9 +80,11 @@
                     </table>
                 </div>
             </div>
+</main>            
 @endsection
 
 @section('script')
+<script src="{{ asset('assets/js/sweetalert2.js') }}"></script>
 <script type="text/javascript">
 let token       = document.querySelector('meta[name="csrf-token"]').content;
 let dataPesanan = [];
@@ -123,7 +125,7 @@ const renderData = () => {
     const tblBody = document.getElementById('tableBody');
     if(dataPesanan.length < 1){
         tblBody.innerHTML = `<tr class="group hover:bg-slate-50/50 transition-colors">
-                                <td colspan="8" class="p-0">
+                                <td colspan="7" class="p-0">
                                     <div class="flex items-center justify-center min-h-[200px]">
                                         <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 text-center">
                                             <i class="fa-solid fa-utensils text-4xl text-slate-200 mb-4 block mx-auto"></i>
@@ -160,16 +162,6 @@ const renderData = () => {
                          </div>`
                         }
                      </td class="py-5 px-4 text-left">
-                     <td>
-                        ${item.statBayar === "sudah bayar" ?
-                        `<div class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-600 border border-indigo-100">
-                            ${item.statBayar}
-                        </div>` :
-                        `<div class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-100">
-                            ${item.statBayar}
-                        </div>`
-                    }
-                     </td>
                      <td class="py-5 px-4 hidden sm:table-cell">
                         <div class="flex items-center text-xs font-bold text-slate-500 bg-slate-100/50 w-fit px-2 py-1 rounded-md">
                             <svg class="mr-1.5" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -222,7 +214,7 @@ run();
         const kodeTemp  = encodeURIComponent("{{ Session::get('kodeTemp') }}");
         const userId    = encodeURIComponent("{{ Session::get('userId') }}");
         const tokenSend = encodeURIComponent(token);
-        socket = new WebSocket("ws://localhost:10000/kasir?kodeTemp="+kodeTemp+"&userId="+userId+"token="+tokenSend);
+        socket = new WebSocket("ws://localhost:10000/kasir?kodeTemp="+kodeTemp+"&userId="+userId+"&token="+tokenSend);
 
         socket.onopen = () => {
              const stat         = document.getElementById('statConnection');
@@ -231,6 +223,38 @@ run();
              stat.innerHTML         = '<p class="text-xs text-emerald-600 font-semibold">Online</p>';
              console.log("TERHUBUNG ✅");
         }
-        
+
+        socket.onclose = () => {
+            if(maxReconnection >= reconnectCount){
+                console.log("CLOSED ❌", reconnectCount);
+                setTimeout(() => {
+                    reconnectCount++;
+                    console.log("Reconnect ke-" + reconnectCount + "...");
+                    const newSocket = new WebSocket("ws://localhost:10000/kasir?kodeTemp="+kodeTemp+"&userId="+userId+"&token="+tokenSend);
+                        newSocket.onopen = socket.onopen;
+                        newSocket.onerror  = socket.onerror;
+                        newSocket.onclose = socket.onclose;
+                        newSocket.onmessage =  socket.onmessage;
+                        socket= newSocket;
+                }, 5000)
+            }else{
+                 Swal.fire({
+                    icon : 'question',
+                    title : 'connection',
+                    text : 'gagal menghubungkan ke server, coba logout kemudian login kembali !'
+                  })
+            }
+        }
+
+        socket.onerror = (e) => {
+            console.log("ERROR ❌", e);
+        };
+
+        socket.onmessage = (e) => {
+            if(e.data === "ada data baru"){
+                run();
+            }
+            console.log(e);
+        }
 </script>
 @endsection

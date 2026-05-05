@@ -96,6 +96,7 @@
                                 <select name="type" id="type" class="form-control form-control-lg">
                                         <option value="satuan">satuan</option>
                                         <option value="paket">paket</option>
+                                        <option value="tambahan">tambahan</option>
                                 </select>
                             </div>
                         </div>

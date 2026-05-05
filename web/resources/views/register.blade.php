@@ -34,7 +34,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="email">email</label>
-                                    <input type="email" id="email" name="email" class="form-control" maxlength="100" placeholder="EMAIL">
+                                    <input type="email" id="email" name="email" class="form-control" maxlength="100" placeholder="example@domain.com" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="no_telpon">Nomor Telepon / HP</label>

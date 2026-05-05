@@ -80,10 +80,8 @@
                 <div class="border-t border-slate-100 px-4 lg:px-8 py-2 bg-slate-50/50">
                     <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
                         <a href="{{route('dashboard')}}" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Home</a>
-                        <button @click="activeTab = 'pending'" :class="activeTab === 'pending' ? 'bg-amber-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Menunggu</button>
-                        <button @click="activeTab = 'preparing'" :class="activeTab === 'preparing' ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Dimasak</button>
-                        <button @click="activeTab = 'ready'" :class="activeTab === 'ready' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Siap Saji</button>
-                        <button @click="activeTab = 'delivered'" :class="activeTab === 'delivered' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Selesai</button>
+                        <a href="{{route('dapur_order')}}" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">Monitor Pesanan</a>
+                        <a href="{{route('doneDapur')}}" class="px-5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">List Sudah dimasak</a>
                     </div>
 
                 </div>

@@ -38,7 +38,7 @@
                     try {
                         const res = xml.responseText;
                         const jsn = JSON.parse(res);
-                        console.log(jsn);
+                        //console.log(jsn);
                         data_pesanan = jsn.load || [];
                        
                         resolve(jsn);
@@ -211,6 +211,7 @@
                 loadingStop();
                  runApp();
             }
+            console.log(e.data);
         }
 
        const updateStatus = (nomor) => {

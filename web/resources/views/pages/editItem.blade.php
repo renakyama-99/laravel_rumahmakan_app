@@ -113,7 +113,7 @@
                                 <div class="input-group-append">
                                     <select name="type" id="type" class="form-control">
                                         @php
-                                            $arrType = array('satuan','paket');
+                                            $arrType = array('satuan','paket','tambahan');
                                             $dbType  = $val->type;
                                             foreach($arrType As $type){
                                                 if($type == $dbType){

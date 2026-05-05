@@ -75,7 +75,7 @@ function validasiToken(token, callback){
         const index = groups[kodeTemp].indexOf(ws);
         if(index > -1){
           groups[kodeTemp].splice(index, 1);
-          console.log("Client keluar:", userId, "| Total:",  groups[kodeTemp].length);
+          console.log("Client keluar:", userId , "| Total user di group " +kodeTemp+" : ",  groups[kodeTemp].length);
         }
       });
 
@@ -108,7 +108,7 @@ function validasiToken(token, callback){
     const date2 = alldate.split('/').join(''); 
     const newInisial = date2+kodeTempat+'J';
     const code = await autocode('tblPenjualan',newInisial,18,1,'kode_temp','tglTrans',kodeTempat);
-    const multipleInput             = `INSERT INTO tmp_penjualan(kode_temp,no_penjualan,user,kode_meja,kode_item,nama_item,harga_jual,diskon,qty,total) VALUES ?`;
+    const multipleInput             = `INSERT INTO tmp_penjualan(kode_temp,no_penjualan,user,kode_meja,kode_item,nama_item,harga_jual,diskon,qty,total,type) VALUES ?`;
     const queryTmpPesanan           = `SELECT * FROM tmp_pesanan WHERE kode_temp=? AND user=? AND kode_meja=?`;
     
     const sumSubtotal             = [];
@@ -125,7 +125,8 @@ function validasiToken(token, callback){
         const diskon   = item.diskon;
         const qty      = item.qty;
         const tot      = item.total;
-        const objectInput = [kodeTemp,code,user,kodeMeja,kodeItem,namaItem,harga,diskon,qty,tot];
+        const type     = item.type;
+        const objectInput = [kodeTemp,code,user,kodeMeja,kodeItem,namaItem,harga,diskon,qty,tot,type];
         valuesTmp_penjualan.push(objectInput);
         sumSubtotal.push(tot);
         con.query(`UPDATE tabel_item SET stok = stok - '${qty}' WHERE kode_temp = '${kodeTemp}' AND kode_item = '${kodeItem}'`);
@@ -134,16 +135,18 @@ function validasiToken(token, callback){
         
          let insertSubtotal = sumSubtotal.reduce((a,b) => a + b,0);
          const dateTime      = mysqlDateTime();
-         const query_single_input = `INSERT INTO tblPenjualan(kode_temp,no_penjualan,namaPelanggan,user_id,kodeMeja,subtotal,keterangan,status,statPesanan,tglTrans) VALUES (?,?,?,?,?,?,?,?,?,?)`;
-         const inserTblPejualan = await queryPromise(query_single_input,[kodeTempat,code,pelanggan,msg.user,msg.meja,insertSubtotal,msg.catatan,"belum bayar","belum dimasak",dateTime]);                           
+         const query_single_input = `INSERT INTO tblPenjualan(kode_temp,no_penjualan,namaPelanggan,user_id,kodeMeja,subtotal,keterangan,status,statPesanan,tglTrans,bayar) VALUES (?,?,?,?,?,?,?,?,?,?,?)`;
+         const inserTblPejualan = await queryPromise(query_single_input,[kodeTempat,code,pelanggan,msg.user,msg.meja,insertSubtotal,msg.catatan,"belum bayar","belum dimasak",dateTime,0]);                           
          const multiInsert      = await queryPromise(multipleInput,[valuesTmp_penjualan]);
          const deleteTmpPesanan = await queryPromise("DELETE FROM tmp_pesanan WHERE kode_temp = ? AND user = ? AND kode_meja = ?",[kodeTempat,msg.user,msg.meja]);
-         console.log(msg.meja);
+         
         groups[kodeTempat].forEach((item,index) => {
-            if(item.kodeTemp == kodeTempat && item.userId == msg.user && item.path == ws.path){
+            if(item.userId == msg.user && item.path == ws.path){
                 item.send('berhasil');
-            }else if(item.kodeTemp == kodeTempat && item.path == "/dapur"){
+            }else if(item.path === "/dapur"){
                 item.send('order baru masuk');
+            }else if(item.path === "/kasir"){
+                item.send('ada data baru');
             }
         })
         
@@ -159,10 +162,12 @@ function validasiToken(token, callback){
    const noPenjualan  = msg.noPenjualan;
    const query        = `UPDATE tblPenjualan set statPesanan='sudah dimasak' WHERE kode_temp=? AND no_penjualan=? `;
    const update       = await queryPromise(query, [kodeTempat, noPenjualan]);
-   console.log('update');
+   console.log('update data oleh :'+ user);
    groups[kodeTempat].forEach((item,index) => {
-    if(item.kodeTemp == kodeTempat && item.userId == user && item.path == ws.path){
+    if(item.userId == user && item.path == ws.path){
       item.send('update sukses');
+    }else if(item.path === "/kasir"){
+      item.send('ada data baru');
     }
    })
  }

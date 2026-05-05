@@ -113,7 +113,7 @@
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input type="text" id="searchMenu"  oninput="cariData()" placeholder="Cari menu..." class="bg-transparent border-none focus:outline-none w-full ml-3 text-sm">
+        <input type="text" id="searchMenu"  oninput="cariData(event.target.value)" placeholder="Cari menu..." class="bg-transparent border-none focus:outline-none w-full ml-3 text-sm">
       </div>
             <!-- User Auth Profile -->
             <div class="flex items-center gap-4">
@@ -166,7 +166,7 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text"  placeholder="Cari makanan..." class="bg-transparent border-none focus:outline-none w-full text-sm">
+          <input type="text" placeholder="Cari makanan..." oninput="cariData(event.target.value)" class="bg-transparent border-none focus:outline-none w-full text-sm">
         </div>
 
         <section>
@@ -197,7 +197,7 @@
       </div>
 
       <!-- SIDEBAR (RIGHT) -->
-      <aside class="lg:w-[380px] order-1 lg:order-2 shrink-0">
+      <aside class="lg:w-[380px] order-1 lg:order-2 shrink-0" id="keranjang">
         <div class="lg:sticky lg:top-28">
           <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden flex flex-col">
             <div class="p-6 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
@@ -261,7 +261,7 @@
   </main>
 
   <!-- MOBILE FLOATING ACTION BAR -->
-  <div id="mobile-cart-bar" class="lg:hidden fixed bottom-6 left-5 right-5 z-40">
+  <div id="mobile-cart-bar" class="lg:hidden fixed bottom-6 left-5 right-5 z-40" onclick="scrollcontent()">
     <button class="w-full bg-orange-600 text-white p-4.5 rounded-[1.75rem] shadow-2xl flex items-center justify-between font-black active:scale-95 transition-all ring-4 ring-white">
       <div class="flex items-center gap-3 ml-2">
         <div class="bg-white/20 p-2 rounded-xl shrink-0">
@@ -314,12 +314,12 @@
       let token = document.querySelector('meta[name="csrf-token"]').content;
       let MENU_DATA = [];
 
-const getData = () => {
+const getData = (searchValue = '') => {
     return new Promise((resolve, reject) => {
         const xml = new XMLHttpRequest();
         const link = "{{route('actionpesanan')}}";
-        const search = document.getElementById('searchMenu').value;
-        const data = "action=loadData&cari="+search;
+        const cariValue = (searchValue || '').trim();
+        const data = "action=loadData&cari="+encodeURIComponent(cariValue);
         
         // 🚀 Prioritas tinggi + no cache
         xml.open('POST', link, true);
@@ -384,6 +384,13 @@ const getKeranjang = () => {
           
 
   });
+}
+const scrollcontent = () => {
+    document.getElementById('keranjang').scrollIntoView({
+    behavior: 'smooth',  // smooth, auto, instant
+    block: 'start',      // start, center, end, nearest
+    inline: 'nearest'    // start, center, end, nearest
+});
 }
 
 const renderCart = (json) => {
@@ -475,7 +482,7 @@ const renderCart = (json) => {
 
 
 
-    function increment(kodetemp,kodeItem,harga,diskon,namaItem) {
+    function increment(kodetemp,kodeItem,harga,diskon,namaItem,type) {
       const meja = document.querySelector('#mejaData').value;
       if(meja == ""){
             Swal.fire({
@@ -492,7 +499,7 @@ const renderCart = (json) => {
           const xml     = new XMLHttpRequest();
           const link    = "{{route('actionpesanan')}}";
           const meja    = document.getElementById("mejaData").value; 
-          let data      = "action=addPesanan&kodeTemp="+kodetemp+"&kode_item="+kodeItem+"&harga="+harga+"&disc="+diskon+"&meja="+meja+"&nama_item="+namaItem;
+          let data      = "action=addPesanan&kodeTemp="+kodetemp+"&kode_item="+kodeItem+"&harga="+harga+"&disc="+diskon+"&meja="+meja+"&nama_item="+namaItem+"&type="+type;
           xml.open("POST",link,true);
           xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
           xml.setRequestHeader('X-CSRF-TOKEN', token);
@@ -513,7 +520,7 @@ const renderCart = (json) => {
 
     }
 
-    function decrement(kodetemp,kodeItem,harga,diskon,namaItem) {
+    function decrement(kodetemp,kodeItem,harga,diskon,namaItem,type) {
        const meja = document.querySelector('#mejaData').value;
       if(meja == ""){
             Swal.fire({
@@ -529,7 +536,7 @@ const renderCart = (json) => {
         const xml     = new XMLHttpRequest();
           const link    = "{{route('actionpesanan')}}";
           const meja    = document.getElementById("mejaData").value; 
-          let data      = "action=delPesanan&kodeTemp="+kodetemp+"&kode_item="+kodeItem+"&harga="+harga+"&disc="+diskon+"&meja="+meja+"&nama_item="+namaItem;
+          let data      = "action=delPesanan&kodeTemp="+kodetemp+"&kode_item="+kodeItem+"&harga="+harga+"&disc="+diskon+"&meja="+meja+"&nama_item="+namaItem+"&type="+type;
           xml.open("POST",link,true);
           xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
           xml.setRequestHeader('X-CSRF-TOKEN', token);
@@ -594,6 +601,13 @@ const renderCart = (json) => {
     
     function renderMenu() {
       if(MENU_DATA.length < 1){
+        const grid = document.getElementById('food-menu-grid');
+        grid.innerHTML = `  <div class="flex items-center justify-center min-h-[200px]">
+                                        <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 text-center">
+                                            <i class="fa-solid fa-utensils text-4xl text-slate-200 mb-4 block mx-auto"></i>
+                                            <p class="text-slate-500 font-medium">Menu yang anda cari tidak ada</p>
+                                        </div>
+                              </div>`;
         console.log("no Data Menu For Load");
       }else if(MENU_DATA.length > 0){
       const grid = document.getElementById('food-menu-grid');
@@ -617,7 +631,7 @@ const renderCart = (json) => {
                             <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
                                 <span class="text-slate-900 font-bold text-xl">${formatRupiah(item.harga)}</span>
                                 <!-- Tombol Minus Bulat Tipis -->
-                                <button onclick="decrement('${item.kodeTem}','${item.kodeItem}',${item.harga},${item.diskon},'${item.namaItem}')" class="w-10 h-10 bg-indigo-600 text-white rounded-lg flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-sm active:scale-95">
+                                <button onclick="decrement('${item.kodeTem}','${item.kodeItem}',${item.harga},${item.diskon},'${item.namaItem}','${item.type}')" class="w-10 h-10 bg-indigo-600 text-white rounded-lg flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-sm active:scale-95">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                   </svg>
@@ -630,7 +644,7 @@ const renderCart = (json) => {
                                       class="w-10 bg-transparent text-center text-lg font-bold text-orange-600 focus:outline-none border-none">
                                 
                                 <!-- Tombol Plus Bulat Biru Tipis -->
-                                <button onclick="increment('${item.kodeTem}','${item.kodeItem}',${item.harga},${item.diskon},'${item.namaItem}')" class="w-10 h-10 bg-indigo-600 text-white rounded-lg flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-sm active:scale-95">
+                                <button onclick="increment('${item.kodeTem}','${item.kodeItem}',${item.harga},${item.diskon},'${item.namaItem}','${item.type}')" class="w-10 h-10 bg-indigo-600 text-white rounded-lg flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-sm active:scale-95">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -645,9 +659,9 @@ const renderCart = (json) => {
      
     }
 
-const cariData = async () => {
+const cariData = async (e) => {
     try {
-        await getData();
+        await getData(e);
     } catch(e) {
         console.error('Search failed:', e);
     }
