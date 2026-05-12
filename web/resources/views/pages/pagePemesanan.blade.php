@@ -233,8 +233,8 @@
                   <span id="cart-subtotal" class="text-slate-800 font-bold">Rp0</span>
                 </div>
                 <div class="flex justify-between text-xs text-slate-500">
-                  <span>Pajak (11%)</span>
-                  <span id="cart-tax" class="text-slate-800 font-bold">Rp0</span>
+                  <!-- <span>Pajak (11%)</span>
+                  <span id="cart-tax" class="text-slate-800 font-bold">Rp0</span> -->
                 </div>
                 <div class="flex justify-between items-center pt-3 mt-1 border-t border-slate-200">
                   <span class="text-lg font-black text-slate-800">Total</span>
@@ -285,7 +285,7 @@
     </button>
   </div>
  <script src="{{ asset('assets/js/sweetalert2.js') }}"></script>
- 
+ <script src="{{ asset('assets/js/host.js') }}"></script>
   <script>
             // Simple Profile Dropdown Toggle Logic
         const profileBtn = document.getElementById('profileBtn');
@@ -683,7 +683,7 @@ let reconnectCount = 0;
 let maxReconnection = 20;
 const kodeTemp  = "{{ Session::get('kodeTemp') }}";
 const userId    = "{{ Session::get('userId') }}";
-socket = new WebSocket("ws://localhost:10000/layanan?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
+socket = new WebSocket("ws://"+host+":10000/layanan?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
 socket.onopen = () => {
   console.log("TERHUBUNG ✅");
 };
@@ -698,7 +698,7 @@ socket.onclose = () => {
         setTimeout(() => {
             reconnectCount++;
             console.log("Reconnect ke-" + reconnectCount + "...");
-            const newSocket = new WebSocket("ws://localhost:10000/layanan?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
+            const newSocket = new WebSocket("ws://"+host+":10000/layanan?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
             newSocket.onopen = socket.onopen;
             newSocket.onerror  = socket.onerror;
             newSocket.onclose = socket.onclose;
@@ -718,7 +718,9 @@ socket.onmessage = function(e){
     if(e.data == 'berhasil'){
       loadKeranjang();
       loadingStop();
+      initApp();
       document.getElementById('namaPelanggan').value = "";
+      document.getElementById('catatan_pesanan').value= "";
       Swal.fire({
         title: "Transaksi suskes!",
         text: "data telah disimpan",

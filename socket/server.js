@@ -68,6 +68,9 @@ function validasiToken(token, callback){
             case 'updatePesanan' :
               updatePesanan(msg,ws,req);
             break;
+            case 'bayar':
+              bayarPesanan(msg,ws);
+            break;
           }
       });
 
@@ -135,8 +138,8 @@ function validasiToken(token, callback){
         
          let insertSubtotal = sumSubtotal.reduce((a,b) => a + b,0);
          const dateTime      = mysqlDateTime();
-         const query_single_input = `INSERT INTO tblPenjualan(kode_temp,no_penjualan,namaPelanggan,user_id,kodeMeja,subtotal,keterangan,status,statPesanan,tglTrans,bayar) VALUES (?,?,?,?,?,?,?,?,?,?,?)`;
-         const inserTblPejualan = await queryPromise(query_single_input,[kodeTempat,code,pelanggan,msg.user,msg.meja,insertSubtotal,msg.catatan,"belum bayar","belum dimasak",dateTime,0]);                           
+         const query_single_input = `INSERT INTO tblPenjualan(kode_temp,no_penjualan,namaPelanggan,user_id,kodeMeja,subtotal,keterangan,status,statPesanan,tglTrans,bayar,metodBayar,cashierClose) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+         const inserTblPejualan = await queryPromise(query_single_input,[kodeTempat,code,pelanggan,msg.user,msg.meja,insertSubtotal,msg.catatan,"belum bayar","belum dimasak",dateTime,0,"belum diset","belum close"]);                           
          const multiInsert      = await queryPromise(multipleInput,[valuesTmp_penjualan]);
          const deleteTmpPesanan = await queryPromise("DELETE FROM tmp_pesanan WHERE kode_temp = ? AND user = ? AND kode_meja = ?",[kodeTempat,msg.user,msg.meja]);
          
@@ -170,6 +173,26 @@ function validasiToken(token, callback){
       item.send('ada data baru');
     }
    })
+ }
+
+ const bayarPesanan = async(msg,ws) => {
+    const user            = ws.userId ;
+    const nomorPenjualan  = msg.noPenjulan;
+    const kdTemp          = msg.kodeTemp;
+    const methodByr       = msg.metodBayar;
+    const totalUtama      = msg.total;
+    const totalTambahan   = msg.bayarTambahan;
+    const queryUpdate     = `UPDATE tblPenjualan set status=?,bayar=?,metodBayar=?,cashierClose=? WHERE kode_temp=? AND no_penjualan=?`;
+    const subTotal        = parseInt(totalUtama) + parseInt(totalTambahan);
+    const statBayar       = "sudah bayar";
+    const update          = await queryPromise(queryUpdate, [statBayar,subTotal,methodByr,user,kdTemp,nomorPenjualan]);
+    groups[kdTemp].forEach((item) => {
+      if(item.userId === user && item.path === ws.path){
+        item.send('update berhasil');
+      }else if(item.path === "/kasir"){
+        item.send('ada update baru');
+      }
+    })
  }
  const mysqlDateTime = () => {
    const now = new Date();

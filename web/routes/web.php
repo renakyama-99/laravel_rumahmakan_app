@@ -89,5 +89,8 @@ Route::get('/cashierMonitor', function() {return view('pages.cashierMonitor'); }
 Route::post('/cashier/actionKasir', [dashboardController::class, 'actionKasir'])->name('actKasir')->middleware('authEmail');
 
 Route::get('/cashierMonitor/bayar/{id}', [dashboardController::class, 'transaksiBayar'])->name('actBayar')->middleware('authEmail');
+Route::get('/cashierMonitor/donebayar/{id}', [dashboardController::class, 'transaksiBayar'])->middleware('authEmail');
+Route::get('/cashierMonitor/nota/{noPenjualam}', [dashboardController::class, 'getNota'])->middleware('authEmail');
+Route::get('/cashierMonitor/notice/{id}', [dashboardController::class, 'transaksiBayar'])->middleware('authEmail');
 
 

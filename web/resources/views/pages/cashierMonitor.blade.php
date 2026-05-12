@@ -85,10 +85,19 @@
 
 @section('script')
 <script src="{{ asset('assets/js/sweetalert2.js') }}"></script>
+ <script src="{{ asset('assets/js/host.js') }}"></script>
 <script type="text/javascript">
+
 let token       = document.querySelector('meta[name="csrf-token"]').content;
 let dataPesanan = [];
+const loadingStop = () => {
+        document.querySelector('.loading-overlay').style.display='none';
+      }
+const loadingStart = () => {
+        document.querySelector('.loading-overlay').style.display='';
+      }
 
+loadingStop();
 const getData = () => {
     return new Promise((resolve,reject) => {
         const xml = new XMLHttpRequest();
@@ -214,7 +223,7 @@ run();
         const kodeTemp  = encodeURIComponent("{{ Session::get('kodeTemp') }}");
         const userId    = encodeURIComponent("{{ Session::get('userId') }}");
         const tokenSend = encodeURIComponent(token);
-        socket = new WebSocket("ws://localhost:10000/kasir?kodeTemp="+kodeTemp+"&userId="+userId+"&token="+tokenSend);
+        socket = new WebSocket("ws://"+host+":10000/kasir?kodeTemp="+kodeTemp+"&userId="+userId+"&token="+tokenSend);
 
         socket.onopen = () => {
              const stat         = document.getElementById('statConnection');
@@ -225,12 +234,16 @@ run();
         }
 
         socket.onclose = () => {
+            const stat         = document.getElementById('statConnection');
+             const tx_stat      = document.getElementById('tx_stat');
+             tx_stat.innerHTML  = '<p class="text-sm font-medium leading-tight">STATUS</p>';
+             stat.innerHTML     = '<p class="text-xs text-rose-600 font-semibold">Offline</p>';
             if(maxReconnection >= reconnectCount){
                 console.log("CLOSED ❌", reconnectCount);
                 setTimeout(() => {
                     reconnectCount++;
                     console.log("Reconnect ke-" + reconnectCount + "...");
-                    const newSocket = new WebSocket("ws://localhost:10000/kasir?kodeTemp="+kodeTemp+"&userId="+userId+"&token="+tokenSend);
+                    const newSocket = new WebSocket("ws://"+host+":10000/kasir?kodeTemp="+kodeTemp+"&userId="+userId+"&token="+tokenSend);
                         newSocket.onopen = socket.onopen;
                         newSocket.onerror  = socket.onerror;
                         newSocket.onclose = socket.onclose;
@@ -253,8 +266,10 @@ run();
         socket.onmessage = (e) => {
             if(e.data === "ada data baru"){
                 run();
+            }else if(e.data === "ada update baru"){
+                run();
             }
-            console.log(e);
+           // console.log(e);
         }
 </script>
 @endsection

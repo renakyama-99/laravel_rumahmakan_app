@@ -755,12 +755,12 @@ class dashboardController extends Controller
                                 );
                         }       
                         echo json_encode($arrData);                              
-                    break;
+                break;
 
                     case 'catalogTambahan' :
                         $noPenjualan = $req->input('noPenjualan');
                         $codeTemp    = Session::get('kodeTemp');
-                        $query       = DB::table('tmp_penjualan')->where('kode_temp',$codeTemp)->where('no_penjualan',$noPenjualan);
+                        $query       = DB::table('tmp_penjualan')->where('kode_temp',$codeTemp)->where('no_penjualan',$noPenjualan)->where('type',"tambahan");
                         $arr         = collect();
                         if($query->count() > 0){
                          $get         = $query->get();
@@ -770,16 +770,80 @@ class dashboardController extends Controller
                                 'kodeTemp' => $value->kode_temp,
                                 'kdPenjualan' => $value->no_penjualan,
                                 'kodeItem'  => $value->kode_item,
+                                'kodeMeja' => $value->kode_meja,
                                 'namaItem' => $value->nama_item,
                                 'qty' => $value->qty,
                                 'hargaJual' => $value->harga_jual,
                                 'diskon' => $value->diskon,
+                                'type'  => $value->type,
                                 'user' => $value->user,
                                 'locationFile' => $codeTemp."/".$namaFile
                             ]);
                         }
                         }
                         echo json_encode($arr);
+                    break;
+
+                    case 'kurangiItem' :
+                        $codeTemp   = $req->input('ktemp');
+                        $codeItem   = $req->input('kItem');
+                        $namaItem   = $req->input('namaItem');
+                        $nomorJual  = $req->input('noJual');
+                        $codeMeja   = $req->input('kMeja');
+                        $user       = $req->input('user');
+                        $hargaJual  = $req->input('hJual');
+                        $diskon     = $req->input('diskon');
+                        $type       = $req->input('type');
+                        $query      = DB::table('tmp_penjualan')->where('kode_temp', $codeTemp)->where('no_penjualan', $nomorJual)
+                                                                ->where('kode_meja', $codeMeja)->where('kode_item',$codeItem);
+                        $count      = $query->count();
+                        if($count > 0){
+                            $potongan = ($hargaJual * $diskon)/100;
+                            $hargaReal = $hargaJual - $potongan;
+                            $cekQty =  $query->value('qty');
+                            if($cekQty > 1){
+                                $updateTmp = $query->update(['qty' => DB::raw('qty - 1') , 'total' => DB::raw('total -'.$hargaReal)]);
+                                $updateItem =  DB::table('tabel_item')->where('kode_temp',$codeTemp)->where('kode_item',$codeItem)->update(['stok' => DB::raw('stok + 1')]);
+                                echo "update";
+                            }elseif($cekQty === 1){
+                                $delete     = $query->delete();
+                                $updateItem =  DB::table('tabel_item')->where('kode_temp',$codeTemp)->where('kode_item',$codeItem)->update(['stok' => DB::raw('stok + 1')]);
+                                echo "delete";
+                            }
+                        }
+                    break;
+
+                    case 'removeItemTambahan' :
+                        $codeTemp   = $req->input('kodeTemp');
+                        $codeItem   = $req->input('kodeItem');
+                        $nomorJual  = $req->input('noJual');
+                        $kodeMeja   = $req->input('kodeMeja');
+                        $qty        = $req->input('qty');
+                        $query      = DB::table('tmp_penjualan')->where('kode_temp', $codeTemp)->where('no_penjualan', $nomorJual)
+                                                                ->where('kode_meja', $kodeMeja)->where('kode_item',$codeItem);
+                        $updateItem  = DB::table('tabel_item')->where('kode_temp',$codeTemp)->where('kode_item',$codeItem)->update(['stok' => DB::raw('stok + '.$qty)]);
+                        $query->delete();
+                        echo "delete";
+                    break;
+
+                    case 'getChart':
+                         $nojual    = $req->input('noJual');
+                         $codeTemp  = Session::get('kodeTemp');
+                         $query     = DB::table('tmp_penjualan')->where('kode_temp', $codeTemp)->where('no_penjualan',$nojual);
+                         $statBayar = DB::table('tblPenjualan')->where('kode_temp', $codeTemp)->where('no_penjualan',$nojual)->value('status');
+                         $arrData    = array(
+                            "statBayar" => $statBayar,
+                            "jmlData" => $query->count(),
+                            "load"    => array()
+                         );
+                         $get       = $query->get();
+                         foreach($get as $index => $value){
+                            $gabung[] = array('type' => $value->type,
+                                                'subtotal' => $value->total
+                                                 );
+                         }
+                         $arrData['load'] = $gabung;
+                         echo json_encode( $arrData);
                         break;
 
         }
@@ -790,16 +854,34 @@ class dashboardController extends Controller
         $query    = DB::table('tblPenjualan')->where('kode_temp', $kodeTemp)->where('no_penjualan',$noPenjualan);
         $count    = $query->count();
         if($count < 1){
-                echo "Error! no Data";
+               return view('notice/noData',['noPenjualan' => $noPenjualan]);
         }elseif($count > 0){
-                $data = $query->select('kodeMeja','user_id')->first();
-                if($data){
-                    $kodeMeja = $data->kodeMeja;
-                    $user     = $data->user_id;
-                    return view('pages/bayar', ['noPenjualan' => $noPenjualan, 'kodeMeja'=>$kodeMeja, 'user' => $user ]);
+                $statBayar = $query->value('status');
+                if($statBayar != "belum bayar"){
+                    $data = $query->select('kodeMeja','user_id')->first();
+                    if($data){
+                        $kodeMeja = $data->kodeMeja;
+                        $user     = $data->user_id;
+                        return view('nota/doneBayar', ['noPenjualan' => $noPenjualan, 'kodeMeja'=>$kodeMeja, 'user' => $user ]);
+                    }
+                }else{
+                    $data = $query->select('kodeMeja','user_id')->first();
+                    if($data){
+                        $kodeMeja = $data->kodeMeja;
+                        $user     = $data->user_id;
+                        return view('pages/bayar', ['noPenjualan' => $noPenjualan, 'kodeMeja'=>$kodeMeja, 'user' => $user ]);
+                    }
                 }
+
                 
         }
+    }
+
+    public function getNota($noPenjualan){
+    $kodeTemp = Session::get('kodeTemp');
+    $query    = DB::table('tblPenjualan')->where('kode_temp', $kodeTemp)->where('no_penjualan',$noPenjualan);
+    $count    = $query->count();
+       return view('nota/nota');
     }
 
 }

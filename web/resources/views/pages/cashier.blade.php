@@ -7,6 +7,7 @@
     <title>Cashier Order Monitor - Laravel Ready</title>
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.css') }}">
+     <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
     
     <!-- ALPINE.JS (Opsional, untuk logika Modal di HTML murni) -->
 
@@ -24,7 +25,14 @@
 
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased">
-
+<div class="loading-overlay">
+            <div class="floating-box">
+              <div class="float-spinner"></div>
+              <div class="loading-text">Sedang Memuat...</div>
+            </div>
+        </div>
+      </div>
+</div>
     <div class="min-h-screen flex flex-col">
         
        <!-- 1. TOP NAVIGATION -->

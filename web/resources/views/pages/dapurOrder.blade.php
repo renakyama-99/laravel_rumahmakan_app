@@ -12,7 +12,10 @@
 @endsection
 @section('footer')
 <script src="{{ asset('assets/js/sweetalert2.js') }}"></script>
+<script src="{{ asset('assets/js/host.js') }}"></script>
+<script src="{{ asset('assets/myjs/audio.js') }}"></script>
  <script>
+
       const loadingStop = () => {
         document.querySelector('.loading-overlay').style.display='none';
       }
@@ -162,7 +165,7 @@
         let maxReconnection = 20;
         const kodeTemp  = "{{ Session::get('kodeTemp') }}";
         const userId    = "{{ Session::get('userId') }}";
-        socket = new WebSocket("ws://localhost:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
+        socket = new WebSocket("ws://"+host+":10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
         socket.onopen = () => {
              const stat             = document.getElementById('statConnection');
              const tx_stat          = document.getElementById('tx-stat');
@@ -186,7 +189,7 @@
                     setTimeout(() =>{
                         reconnectCount++;
                         console.log(" Reconnect ke-" + reconnectCount + "...");
-                        const newSocket     = new WebSocket("ws://localhost:10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
+                        const newSocket     = new WebSocket("ws://"+host+":10000/dapur?kodeTemp="+encodeURIComponent(kodeTemp)+"&userId="+encodeURIComponent(userId)+"&token="+encodeURIComponent(token));
                         newSocket.onopen    = socket.onopen;
                         newSocket.onerror   = socket.onerror;
                         newSocket.onclose   = socket.onclose;
@@ -206,10 +209,12 @@
         socket.onmessage = (e) => {
             if(e.data == "order baru masuk"){
                 loadingStop();
-                 runApp();
+                runApp();
+                playAlert({ frequency: 1200, volume: 0.8, repeat: 6 });   // 5x keras
             }else if(e.data == "update sukses"){
                 loadingStop();
                  runApp();
+                 playAlert({ frequency: 1200, volume: 0.8, repeat: 6 });   // 5x keras
             }
             console.log(e.data);
         }
@@ -242,5 +247,8 @@
          }
        }
     statConnection();
+
+
+     
 </script>
 @endsection
